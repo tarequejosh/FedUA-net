@@ -44,7 +44,8 @@ conda run -n research python experiment.py --strategies fedua --seeds 0 1 2 --ro
 
 ## 4. Results
 
-**FedUA-Net achieved:**
+**1. Federated Learning Phase (3-Seed Average):**
+FedUA-Net achieved:
 - **Accuracy:** 88.2%
 - **Mean F1:** 87.4%
 
@@ -54,9 +55,11 @@ It outperformed several federated learning methods:
 - **FedBN:** 80.3%
 - **FedAvg:** 79.2%
 
-*Note: Local-only (91.7%) and Ditto (92.2%) had higher accuracy, but they do not provide the same uncertainty and coverage approach as FedUA-Net.*
+*Note: Local-only (91.7%) and Ditto (92.2%) had higher raw accuracy, but they do not provide the same uncertainty and coverage approach as FedUA-Net.*
 
-**Final Federated Results Breakdown (10 rounds + personalization):**
+**2. Post-Personalization Phase (Single Seed Fine-Tuned):**
+After local fine-tuning, FedUA-Net reaches even higher performance across the 3 distinct modalities:
+
 | Client | Modality | Accuracy | F1 Score | AUC |
 |--------|----------|----------|----------|-----|
 | C0 | Brain MRI | 96.06% | 0.9601 | 0.982 |
