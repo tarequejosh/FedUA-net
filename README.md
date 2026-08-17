@@ -2,7 +2,7 @@
 
 FedUA-Net is a cross-silo federated learning system designed for multi-modal medical image classification. It enables collaborative learning across different hospitals, each holding a distinct imaging modality with disjoint label sets, while preserving data privacy and quantifying uncertainty.
 
-## 📊 Datasets & Modalities
+## Datasets & Modalities
 The system integrates 11 classes across 3 disjoint modalities, simulating extreme statistical heterogeneity (feature-shift + label-skew non-IID):
 
 | Client | Hospital | Modality | Classes | Train Images |
@@ -11,13 +11,13 @@ The system integrates 11 classes across 3 disjoint modalities, simulating extrem
 | **C1** | Hospital B | Breast Ultrasound (BUSI) | 3 (benign, malignant, normal) | ~546 |
 | **C2** | Hospital C | COVID-19 X-Ray | 4 (covid, lung_opacity, normal, pneumonia) | ~14,815 |
 
-## 🧠 Architecture
+## Architecture
 FedUA-Net utilizes a **FedPer + FedBN** inspired architecture:
 1. **Shared Body (Federated):** EfficientNetV2-S (ImageNet pretrained) + CBAM (Channel/Spatial Attention) + GAP + Dense(512). BatchNorm layers are excluded from server averaging to handle domain shift.
 2. **Local Head (Client-Specific):** A dedicated classification head that remains local to each hospital.
 3. **Uncertainty Calibration (Post-FL):** MC-Dropout (0.30) entropy is used as an uncertainty signal, calibrated with temperature scaling and Conformal Prediction (APS) for robust prediction sets.
 
-## 🚀 Quickstart & Execution
+## Quickstart & Execution
 
 ### Requirements
 - **OS:** Windows 11
@@ -42,7 +42,7 @@ conda run -n research python experiment.py --strategies fedua --seeds 0 1 2 --ro
 > - Ensure `num_workers <= 4` to prevent `WinError 1455`.
 > - Do not enable AMP (fp16) as it causes NaN in evaluation metrics.
 
-## 🏆 Key Results
+## Key Results
 
 FedUA-Net achieves competitive accuracy while providing robust, calibrated uncertainty estimates suitable for clinical deployment.
 
