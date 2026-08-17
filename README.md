@@ -42,11 +42,21 @@ conda run -n research python experiment.py --strategies fedua --seeds 0 1 2 --ro
 > - Ensure `num_workers <= 4` to prevent `WinError 1455`.
 > - Do not enable AMP (fp16) as it causes NaN in evaluation metrics.
 
-## Key Results
+## 4. Results
 
-FedUA-Net achieves competitive accuracy while providing robust, calibrated uncertainty estimates suitable for clinical deployment.
+**FedUA-Net achieved:**
+- **Accuracy:** 88.2%
+- **Mean F1:** 87.4%
 
-**Final Federated Results (10 rounds + personalization):**
+It outperformed several federated learning methods:
+- **FedBABU:** 87.4%
+- **FedProx:** 81.8%
+- **FedBN:** 80.3%
+- **FedAvg:** 79.2%
+
+*Note: Local-only (91.7%) and Ditto (92.2%) had higher accuracy, but they do not provide the same uncertainty and coverage approach as FedUA-Net.*
+
+**Final Federated Results Breakdown (10 rounds + personalization):**
 | Client | Modality | Accuracy | F1 Score | AUC |
 |--------|----------|----------|----------|-----|
 | C0 | Brain MRI | 96.06% | 0.9601 | 0.982 |
