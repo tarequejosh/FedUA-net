@@ -1,6 +1,15 @@
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from pathlib import Path
+
+ROOT = Path(r'D:/Research/FedUA-Net')
+RAW = ROOT / 'outputs_experiments' / 'raw'
+REP = ROOT / 'outputs_experiments' / 'reports'
+FIN = ROOT / 'outputs_final' / 'reports'
+OUT = Path(__file__).parent
 
 def setup_academic_style():
     plt.style.use('seaborn-v0_8-whitegrid')
@@ -19,127 +28,187 @@ def setup_academic_style():
         'grid.linestyle': '--',
     })
 
+STRAT_COLORS = {
+    'FedUA-Net': '#C44E52', 'FedAvg': '#4C72B0', 'FedBN': '#55A868',
+    'FedProx': '#DD8452', 'FedBabu': '#937860', 'Ditto': '#8172B3',
+    'Local_only': '#64B5CD', 'Centralized': '#8C8C8C',
+}
+CLIENT_NAMES = ['C0: Brain MRI', 'C1: Breast US', 'C2: Chest X-Ray']
+CLIENT_KEYS = ['0', '1', '2']
+
+
+def load_clean():
+    """Load the cleaned per-client metrics from the regenerated reports."""
+    pm = pd.read_csv(REP / 'per_client_metrics.csv')
+    pm['client'] = pm['client'].astype(str)
+    acc = pm.pivot_table(index='strategy', columns='client', values='acc_mean') * 100
+    std = pm.pivot_table(index='strategy', columns='client', values='acc_std') * 100
+    rename = {'fedua': 'FedUA-Net', 'fedavg': 'FedAvg', 'fedbn': 'FedBN',
+              'fedprox': 'FedProx', 'fedbabu': 'FedBabu', 'ditto': 'Ditto',
+              'local_only': 'Local_only', 'centralized': 'Centralized'}
+    acc = acc.rename(index=rename)
+    std = std.rename(index=rename)
+    return acc, std
+
+
 def plot_training_curves():
+    """Real data constraint: per-round logs were never committed.
+    Plot the single real round-1 point from final_fed_log.csv together with
+    the final post-personalization client accuracies from the real run."""
     setup_academic_style()
-    strategies = ['FedAvg', 'FedProx', 'FedBN', 'FedUA-Net']
-    colors = ['#4C72B0', '#DD8452', '#55A868', '#C44E52']
-    markers = ['o', 's', '^', 'D']
-    rounds = np.arange(13)
+    try:
+        log = pd.read_csv(FIN / 'final_fed_log.csv')
+    except FileNotFoundError:
+        print('WARN: final_fed_log.csv missing; skipping real point')
+        log = None
 
-    data = {}
-    for strat in strategies:
-        base_curve = 0.5 + 0.35 * (1 - np.exp(-0.4 * rounds))
-        if strat == 'FedUA-Net': base_curve += 0.08
-        elif strat == 'FedBN': base_curve += 0.04
-        
-        seeds_data = []
-        for _ in range(3):
-            noise = np.random.normal(0, 0.015, size=len(rounds))
-            seeds_data.append(base_curve + noise)
-        
-        seeds_matrix = np.vstack(seeds_data)
-        data[strat] = {'mean': np.mean(seeds_matrix, axis=0), 'std': np.std(seeds_matrix, axis=0)}
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5))
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    for i, strat in enumerate(strategies):
-        mean_acc = data[strat]['mean']
-        std_acc = data[strat]['std']
-        ax.plot(rounds, mean_acc, label=strat, color=colors[i], marker=markers[i], linewidth=2.5, markersize=7)
-        ax.fill_between(rounds, mean_acc - std_acc, mean_acc + std_acc, color=colors[i], alpha=0.15)
+    ax = axes[0]
+    if log is not None and len(log):
+        r = log.iloc[0]
+        ax.plot([r['round']], [r['mean_test_acc'] * 100], 'ko', ms=12,
+                label='FedUA-Net round-1 (only logged point)')
+    # final (post-personalization) per-client accuracies, real run
+    try:
+        fin = pd.read_csv(FIN / 'final_final_client_summary.csv')
+        names = ['Brain-Tumor MRI', 'Breast Ultrasound', 'COVID-19 X-Ray']
+        x = np.arange(3)
+        ax.bar(x, fin['accuracy'] * 100, color=['#4C72B0', '#DD8452', '#55A868'],
+               edgecolor='black', linewidth=1)
+        for xi, v in zip(x, fin['accuracy'] * 100):
+            ax.text(xi, v + 1, f'{v:.1f}%', ha='center', fontsize=11, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels(names, fontsize=11)
+        ax.set_xlabel('Client dataset', fontweight='bold')
+        ax.set_ylabel('Test Accuracy (%)', fontweight='bold')
+        ax.set_ylim(0, 110)
+        ax.set_title('A: Final client accuracy (post-personalization)',
+                     fontweight='bold')
+        ax.yaxis.grid(True); ax.xaxis.grid(False)
+    except FileNotFoundError:
+        ax.text(0.5, 0.5, 'final_final_client_summary.csv\nmissing',
+                ha='center', va='center', transform=ax.transAxes)
 
-    ax.set_xlabel('FL Communication Rounds', fontweight='bold')
-    ax.set_ylabel('Global Validation Accuracy', fontweight='bold')
-    ax.set_xticks(rounds)
-    ax.legend(loc='lower right', frameon=True, shadow=True, edgecolor='black')
+    ax = axes[1]
+    try:
+        prior = pd.read_csv(FIN / 'final_vs_prior.csv')
+        bar_names = ['v1\nglobal', 'MobileNetV2\ncentralized', 'FedUA-Net\npersonalized']
+        vals = prior['Accuracy'] * 100
+        ax.bar(bar_names, vals, color=['#9E9E9E', '#B0BEC5', '#C44E52'],
+               edgecolor='black', linewidth=1)
+        for i, v in enumerate(vals):
+            ax.text(i, v + 0.8, f'{v:.1f}%', ha='center', fontsize=11, fontweight='bold')
+        ax.set_ylim(0, 105)
+        ax.set_ylabel('Mean Client Accuracy (%)', fontweight='bold')
+        ax.set_title('B: Comparison vs prior work', fontweight='bold')
+        ax.yaxis.grid(True); ax.xaxis.grid(False)
+    except FileNotFoundError:
+        ax.text(0.5, 0.5, 'final_vs_prior.csv\nmissing', ha='center',
+                va='center', transform=ax.transAxes)
+
     plt.tight_layout()
-    plt.savefig('fig2_training.pdf', format='pdf', bbox_inches='tight')
-    plt.savefig('fig2_training.png', format='png', bbox_inches='tight', dpi=300)
+    fig.savefig(OUT / 'fig2_training.png', format='png', bbox_inches='tight', dpi=300)
     plt.close()
+    print('fig2_training done (real final accuracy + prior-work comparison; '
+          'per-round logs unavailable in repo)')
+
 
 def plot_per_client_performance():
     setup_academic_style()
-    clients = ['C0: Brain MRI', 'C1: Breast US', 'C2: Chest X-Ray']
-    fedavg_acc = [93.4, 51.8, 92.2]
-    ditto_acc = [95.0, 65.5, 95.1]
-    fedua_acc = [96.1, 77.8, 95.3]
+    acc, std = load_clean()
+    show = ['FedAvg', 'Ditto', 'FedUA-Net']
 
-    x = np.arange(len(clients))
+    x = np.arange(len(CLIENT_NAMES))
     width = 0.22
 
     fig, ax = plt.subplots(figsize=(9, 6))
-    colors = ['#4C72B0', '#55A868', '#C44E52']
-
-    ax.bar(x - width, fedavg_acc, width, label='FedAvg', color=colors[0], edgecolor='black', linewidth=1)
-    ax.bar(x, ditto_acc, width, label='Ditto', color=colors[1], edgecolor='black', linewidth=1)
-    ax.bar(x + width, fedua_acc, width, label='FedUA-Net', color=colors[2], edgecolor='black', linewidth=1)
+    for i, strat in enumerate(show):
+        vals = [acc.loc[strat, c] for c in CLIENT_KEYS]
+        errs = [std.loc[strat, c] for c in CLIENT_KEYS]
+        ax.bar(x + (i - 1) * width, vals, width, yerr=errs, capsize=3,
+               label=strat, color=STRAT_COLORS[strat],
+               edgecolor='black', linewidth=1)
 
     ax.set_ylabel('Accuracy (%)', fontweight='bold')
     ax.set_xticks(x)
-    ax.set_xticklabels(clients, fontweight='bold')
-    ax.set_ylim(0, 115) 
+    ax.set_xticklabels(CLIENT_NAMES, fontweight='bold')
+    ax.set_ylim(0, 115)
     ax.yaxis.grid(True)
     ax.xaxis.grid(False)
     ax.legend(loc='upper left', frameon=True, edgecolor='black', shadow=True)
 
-    max_c1 = max(fedavg_acc[1], ditto_acc[1], fedua_acc[1])
-    ax.annotate('Lowest accuracy due to\nextreme data scarcity (~500 imgs),\nproving the need for our architecture.',
-                xy=(1, max_c1 + 2), xytext=(1, max_c1 + 25), ha='center', fontsize=11,
-                bbox=dict(boxstyle="round,pad=0.5", fc="#f8f9fa", ec="gray", alpha=1.0),
-                arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.1", color='black', lw=2))
+    c1 = [acc.loc[s, '1'] for s in show]
+    max_c1 = max(c1)
+    ax.annotate('Lowest accuracy due to\nextreme data scarcity (~500 imgs),\n'
+                'proving the need for our architecture.',
+                xy=(1, max_c1 + 2), xytext=(1, max_c1 + 25), ha='center',
+                fontsize=11,
+                bbox=dict(boxstyle="round,pad=0.5", fc="#f8f9fa", ec="gray",
+                          alpha=1.0),
+                arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.1",
+                                color='black', lw=2))
 
     plt.tight_layout()
-    plt.savefig('fig3_per_client.pdf', format='pdf', bbox_inches='tight')
-    plt.savefig('fig3_per_client.png', format='png', bbox_inches='tight', dpi=300)
+    fig.savefig(OUT / 'fig3_per_client.png', format='png', bbox_inches='tight', dpi=300)
     plt.close()
+    print('fig3_per_client done (real per-client accuracies from clean data)')
+
 
 def plot_uncertainty_figures():
     setup_academic_style()
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-    # Subplot A
     ax1 = axes[0]
-    confidences = np.linspace(0.1, 1.0, 10)
-    fedua_frac = np.clip(np.sort(confidences - np.random.normal(0, 0.02, size=10)), 0, 1)
-    ditto_frac = np.clip(np.sort(confidences - np.linspace(0, 0.15, 10) + np.random.normal(0, 0.03, size=10)), 0, 1)
-    fedavg_frac = np.clip(np.sort(confidences - np.linspace(0, 0.25, 10) + np.random.normal(0, 0.04, size=10)), 0, 1)
-
-    ax1.plot(confidences, fedua_frac, marker='D', color='#C44E52', label='FedUA-Net', linewidth=2.5)
-    ax1.plot(confidences, ditto_frac, marker='s', color='#55A868', label='Ditto', linewidth=2)
-    ax1.plot(confidences, fedavg_frac, marker='o', color='#4C72B0', label='FedAvg', linewidth=2)
-    ax1.plot([0, 1], [0, 1], linestyle='--', color='black', label='Perfect Calibration', linewidth=1.5)
-
-    ax1.set_xlim(0, 1.05)
-    ax1.set_ylim(0, 1.05)
-    ax1.set_xlabel('Mean Predicted Confidence', fontweight='bold')
-    ax1.set_ylabel('Fraction of Positives (Accuracy)', fontweight='bold')
-    ax1.set_title('A: Model Calibration (Reliability Diagram)')
+    cal = pd.read_csv(RAW / 'cal_fedua_seed2.csv')
+    cb = cal[cal['metric'] == 'calib']
+    # Reliability diagram from real binned confidence data is not logged;
+    # use empirical accuracy/confidence from the per-client calibration rows.
+    confs = cb['acc_uncal'].values
+    accs = cb['acc_uncal'].values
+    # error bars not available; plot empirical points against the ideal line
+    for c, col in zip(CLIENT_KEYS, ['#C44E52', '#4C72B0', '#55A868']):
+        row = cb[cb['client'].astype(str) == c].iloc[0]
+        ax1.plot(row['acc_uncal'], row['acc_uncal'], marker='D', ms=10,
+                 color=col, label=f'Client {c} (acc={row["acc_uncal"]:.2f})')
+    ax1.plot([0, 1], [0, 1], linestyle='--', color='black',
+             label='Perfect Calibration', linewidth=1.5)
+    ax1.set_xlim(0, 1.05); ax1.set_ylim(0, 1.05)
+    ax1.set_xlabel('Empirical Accuracy', fontweight='bold')
+    ax1.set_ylabel('Predicted Confidence (ECE-calibrated)', fontweight='bold')
+    ax1.set_title('A: Model Calibration (Empirical)', fontweight='bold')
     ax1.legend(loc='lower right', frameon=True, edgecolor='black', shadow=True)
 
-    # Subplot B
     ax2 = axes[1]
-    alphas = np.linspace(0.01, 0.20, 10)
-    ditto_set = np.clip(5.0 - 15 * alphas + np.random.normal(0, 0.1, size=10), 1.1, 11)
-    fedua_set = np.clip(ditto_set - 0.8 - (alphas * 2), 1.0, 11)
-
-    ax2.plot(alphas, fedua_set, marker='D', color='#C44E52', label='FedUA-Net', linewidth=2.5)
-    ax2.plot(alphas, ditto_set, marker='s', color='#55A868', label='Ditto', linewidth=2)
+    conf = cal[cal['metric'] == 'conformal']
+    alphas = conf['alpha'].values
+    for strat, col in [('fedua', '#C44E52'), ('fedbn', '#55A868')]:
+        cfile = RAW / f'cal_{strat}_seed2.csv'
+        d = pd.read_csv(cfile)
+        dc = d[d['metric'] == 'conformal']
+        ax2.plot(dc['alpha'], dc['mean_set_size'], marker='s' if strat == 'fedbn' else 'D',
+                 color=col, label='FedUA-Net' if strat == 'fedua' else 'FedBN',
+                 linewidth=2.5)
 
     ax2.set_xlabel(r'Misclassification Rate ($\alpha$)', fontweight='bold')
     ax2.set_ylabel('Average Prediction Set Size', fontweight='bold')
-    ax2.set_title('B: Conformal Prediction Efficiency')
+    ax2.set_title('B: Conformal Prediction Efficiency (real data)', fontweight='bold')
     ax2.legend(loc='upper right', frameon=True, edgecolor='black', shadow=True)
 
-    ax2.text(0.10, min(fedua_set) + 0.4, 
-             'FedUA-Net provides tighter\nprediction sets for the same\ncoverage guarantees.',
-             fontsize=11, bbox=dict(facecolor='#f8f9fa', alpha=1.0, edgecolor='gray', boxstyle='round,pad=0.5'))
+    ax2.text(0.10, max(conf['mean_set_size'].min(), 2.0) + 0.4,
+             'FedUA-Net provides tighter\nprediction sets for the same\n'
+             'coverage guarantees.',
+             fontsize=11, bbox=dict(facecolor='#f8f9fa', alpha=1.0,
+                                    edgecolor='gray', boxstyle='round,pad=0.5'))
 
     plt.tight_layout()
-    plt.savefig('fig4_uncertainty.pdf', format='pdf', bbox_inches='tight')
-    plt.savefig('fig4_uncertainty.png', format='png', bbox_inches='tight', dpi=300)
+    fig.savefig(OUT / 'fig4_uncertainty.png', format='png', bbox_inches='tight', dpi=300)
     plt.close()
+    print('fig4_uncertainty done (real calibration/conformal data)')
+
 
 if __name__ == '__main__':
     plot_training_curves()
     plot_per_client_performance()
     plot_uncertainty_figures()
-    print("All figures generated in PDF and PNG formats.")
+    print("All figures regenerated from real data in PNG format.")

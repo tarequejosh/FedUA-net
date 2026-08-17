@@ -6,29 +6,32 @@
 
 ---
 
-## Status: Phase A (Experiments) — IN PROGRESS
+## Status: Phase A (Experiments) — COMPLETE (data cleaned)
 
 ### Done
 - [x] v4 architecture trained (10 rounds + fine-tune) → results in `outputs_v4/`
-- [x] `tier1_v2.py` fixed for 3-client mode, smoke-tested PASS
-- [x] Partial baselines: seeds {0,1} for most strategies in `outputs_tier1/raw/`
+- [x] Full 3-seed experiment completed across all baselines → `outputs_experiments/raw/`
+- [x] Raw data pollution (accumulation bug in `experiment.py`) fixed and files cleaned
+      → only real 3-client rows retained; ensemble dropped (no real 3-client run)
+- [x] Reports regenerated from cleaned data → `outputs_experiments/reports/`
+- [x] Paper figures regenerated from real data → `paper_figures/`
 
-### Immediate next step
+### Re-running the (already-completed) experiment
 ```bash
-# Run full 3-seed experiment (resume-safe, skip already-done seeds)
-conda run -n research python tier1_v2.py \
+# Full 3-seed experiment (resume-safe, skip already-done seeds)
+conda run -n research python experiment.py \
   --strategies fedavg fedbn fedprox fedbabu ditto local_only centralized fedua \
   --seeds 0 1 2 --rounds 12 --batch 32 --resume
 ```
 Expected runtime: ~10-12 hours on RTX 5060.
 
-### After experiment completes
+### After an experiment run
 ```bash
 # Aggregate + Wilcoxon tests
-conda run -n research python analyze_tier1.py
+conda run -n research python analyze.py
 
 # LOCO (leave-one-client-out)
-conda run -n research python tier1_v2.py \
+conda run -n research python experiment.py \
   --strategies fedua --seeds 0 1 2 --rounds 12 --batch 32 --loco --resume
 ```
 

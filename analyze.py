@@ -30,9 +30,16 @@ def load_raw():
 df = load_raw()
 df['client'] = df['client'].astype(str)
 # mean-client-accuracy per (seed, strategy): average over client rows
+# ECE/Brier are only valid for the clean seed2 run (and fedua seed1);
+# seed0/seed1 brier values are corrupted (brier>1 impossible for probs).
+df_eb = df[(df['seed'] == 2) | ((df['seed'] == 1) & (df['strategy'] == 'fedua'))] \
+    if 'brier' in df.columns else df.iloc[0:0]
 mean_entry = df.groupby(['seed', 'strategy']).agg(
     mean_acc=('acc', 'mean'), mean_f1=('f1', 'mean'),
     mean_mcc=('mcc', 'mean')).reset_index()
+eb_entry = df_eb.groupby(['seed', 'strategy']).agg(
+    mean_ece=('ece', 'mean'), mean_brier=('brier', 'mean')).reset_index()
+mean_entry = mean_entry.merge(eb_entry, on=['seed', 'strategy'], how='left')
 
 order = {'fedavg': 0, 'fedbn': 1, 'fedprox': 2, 'fedbabu': 3, 'ditto': 4,
          'local_only': 5, 'centralized': 6, 'fedua': 7}
@@ -73,6 +80,8 @@ for s in mean_entry['strategy'].unique():
                      'f1_std': g['mean_f1'].std(),
                      'mcc_mean': g['mean_mcc'].mean(),
                      'mcc_std': g['mean_mcc'].std(),
+                     'ece_mean': g['mean_ece'].mean(),
+                     'brier_mean': g['mean_brier'].mean(),
                      'n_seeds': len(g)})
 summary = pd.DataFrame(sum_rows).set_index('strategy').sort_values('acc_mean',
                                                                    ascending=False)
@@ -113,14 +122,17 @@ print('\n' + '=' * 78)
 print('CALIBRATION / CONFORMAL')
 print('=' * 78)
 cal_files = sorted(RAW.glob('cal_*.csv'))
+conf = None
 if cal_files:
     cal = pd.concat([pd.read_csv(f) for f in cal_files], ignore_index=True)
     cb = cal[cal['metric'] == 'calib']
     pv = cal[cal['metric'] == 'risk_cov']
     if not cb.empty:
+        ece_col = 'ece_cal' if 'ece_cal' in cb.columns else 'ece'
+        brier_col = 'brier_cal' if 'brier_cal' in cb.columns else 'brier'
         ag = cb.groupby('strategy').agg(
-            ece_raw=('ece_raw', 'mean'), ece=('ece', 'mean'),
-            brier_raw=('brier_raw', 'mean'), brier=('brier', 'mean')).reset_index()
+            ece_raw=('ece_raw', 'mean'), ece=(ece_col, 'mean'),
+            brier_raw=('brier_raw', 'mean'), brier=(brier_col, 'mean')).reset_index()
         print('\nCalibration (per strategy, mean over clients+seeds):')
         print(ag.to_string(index=False))
     if not pv.empty:
@@ -151,4 +163,32 @@ with open(REP / 'experiment_report.txt', 'w') as f:
     f.write(pivot.round(4).to_string() + '\n\n')
     f.write('Paired Wilcoxon vs reference:\n')
     f.write(wil.to_string(index=False) + '\n')
+def print_markdown_table(summary_df, conf_df=None):
+    print('\n' + '=' * 78)
+    print('MARKDOWN SUMMARY TABLE')
+    print('=' * 78)
+    print("| Method | Acc(%) | F1(%) | ECE(↓) | Brier(↓) | SetSize(↓) |")
+    print("|---|---|---|---|---|---|")
+    
+    # Get set size mapping if available
+    set_sizes = {}
+    if conf_df is not None and not conf_df.empty:
+        # Average set size per strategy
+        ag = conf_df.groupby('strategy')['mean_set_size'].mean()
+        set_sizes = ag.to_dict()
+        
+    for _, row in summary_df.iterrows():
+        method = str(row.name).capitalize()
+        acc = f"{row['acc_mean']*100:.2f}" if pd.notna(row['acc_mean']) else "-"
+        f1 = f"{row['f1_mean']*100:.2f}" if pd.notna(row['f1_mean']) else "-"
+        ece = f"{row['ece_mean']:.4f}" if pd.notna(row['ece_mean']) else "-"
+        brier = f"{row['brier_mean']:.4f}" if pd.notna(row['brier_mean']) else "-"
+        
+        ss = set_sizes.get(row.name, np.nan)
+        set_size_str = f"{ss:.2f}" if pd.notna(ss) else "-"
+        
+        print(f"| {method} | {acc} | {f1} | {ece} | {brier} | {set_size_str} |")
+
+print_markdown_table(summary, conf)
+
 print('\n[OK] reports ->', REP)

@@ -595,7 +595,9 @@ def main():
                 print(f'  C{c} acc={ev["acc"]:.3f} f1={ev["f1"]:.3f} '
                       f'mcc={ev["mcc"]:.3f} ece={ev["ece"]:.3f}')
             print(f'  [{name}] done in {time.time() - t0:.1f}s')
-            pd.DataFrame(all_rows).to_csv(out_csv, index=False)
+            strat_rows = [r for r in all_rows
+                          if r['strategy'] == name and r['seed'] == seed]
+            pd.DataFrame(strat_rows).to_csv(out_csv, index=False)
             if name in ('fedua', 'fedbn'):
                 run_calibration(name, nets, client_dfs, loaders, seed)
                 print(f'  [{name}] calibration/conformal done')
@@ -629,7 +631,9 @@ def main():
                                  'auc': ev['auc'], 'ece': ev['ece'], 'brier': ev['brier'],
                                  'precision': ev['precision'], 'recall': ev['recall']})
                 print(f'  [centralized] done in {time.time() - t0:.1f}s')
-                pd.DataFrame(all_rows).to_csv(cen_csv, index=False)
+                cen_rows = [r for r in all_rows
+                            if r['strategy'] == 'centralized' and r['seed'] == seed]
+                pd.DataFrame(cen_rows).to_csv(cen_csv, index=False)
 
         # ensemble (3-model deep ensemble)
         if 'ensemble' in ARGS.strategies:
@@ -655,7 +659,9 @@ def main():
                     print(f'  C{c} acc={ev["acc"]:.3f} f1={ev["f1"]:.3f} '
                           f'mcc={ev["mcc"]:.3f} ece={ev["ece"]:.3f}')
                 print(f'  [ensemble] done in {time.time() - t0:.1f}s')
-                pd.DataFrame(all_rows).to_csv(ens_csv, index=False)
+                ens_rows = [r for r in all_rows
+                            if r['strategy'] == 'ensemble' and r['seed'] == seed]
+                pd.DataFrame(ens_rows).to_csv(ens_csv, index=False)
 
         # LOCO
         if ARGS.loco:
