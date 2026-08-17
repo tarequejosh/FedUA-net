@@ -3,6 +3,9 @@ Dataset/
 outputs_final/models/*.pt
 outputs_experiments/models/*.pt
 
+# Generated paper figures (regenerate via paper_figures/generate_paper_figures.py)
+paper_figures/*.png
+
 # Python caches
 __pycache__/
 *.pyc
