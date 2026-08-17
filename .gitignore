@@ -1,7 +1,7 @@
 # Datasets
 Dataset/
-outputs_v4/models/*.pt
-outputs_tier1/models/*.pt
+outputs_final/models/*.pt
+outputs_experiments/models/*.pt
 
 # Python caches
 __pycache__/

@@ -1,5 +1,5 @@
 # ============================================================
-# FedUA-Net v4 - PyTorch GPU port
+# FedUA-Net - PyTorch GPU port
 # Federated Uncertainty-Aware Attention Network
 # Improvements vs v3 (TF):
 #   1) Personalized federated learning: shared feature body
@@ -60,7 +60,7 @@ class Config:
     VAL_FRAC     = 0.15                   # brain tumor: val out of train
     SMOKE        = False                  # tiny subset for pipeline test
     DATA_ROOT    = r'D:/Research/FedUA-Net/Dataset'
-    OUTPUT_DIR   = r'D:/Research/FedUA-Net/outputs_v4'
+    OUTPUT_DIR   = r'D:/Research/FedUA-Net/outputs_final'
 
 cfg = Config()
 
@@ -616,7 +616,7 @@ def main():
     t_start = time.time()
 
     print('=' * 72)
-    print('  FEDUA-NET v4 (PyTorch) - PERSONALIZED FEDERATED TRAINING')
+    print('  FEDUA-NET (PyTorch) - PERSONALIZED FEDERATED TRAINING')
     print(f'  Rounds={cfg.COMM_ROUNDS}  local_epochs={cfg.LOCAL_EPOCHS}  '
           f'agg_weights={agg_w}')
     print(f'  Backbone={cfg.BACKBONE}  FedPer heads + FedBN-style local BN')
@@ -714,12 +714,12 @@ def main():
     summary_df = pd.DataFrame(summary)
     print('\n  --- Summary table ---')
     print(summary_df.to_string(index=False))
-    summary_df.to_csv(out / 'reports' / 'v4_client_summary.csv', index=False)
-    pd.DataFrame(per_class_rows).to_csv(out / 'reports' / 'v4_per_class.csv', index=False)
-    pd.DataFrame(log_rows).to_csv(out / 'reports' / 'v4_fed_log.csv', index=False)
+    summary_df.to_csv(out / 'reports' / 'final_client_summary.csv', index=False)
+    pd.DataFrame(per_class_rows).to_csv(out / 'reports' / 'final_per_class.csv', index=False)
+    pd.DataFrame(log_rows).to_csv(out / 'reports' / 'final_fed_log.csv', index=False)
 
-    with open(out / 'reports' / 'v4_report.txt', 'w') as f:
-        f.write('FedUA-Net v4 (PyTorch) evaluation report\n')
+    with open(out / 'reports' / 'final_report.txt', 'w') as f:
+        f.write('FedUA-Net (PyTorch) evaluation report\n')
         f.write('=' * 60 + '\n')
         f.write(summary_df.to_string(index=False) + '\n')
         f.write('\nPer-class:\n')
@@ -747,14 +747,14 @@ def main():
                             'uncertainty': uq['uncertainty'][i]})
     if uq_rows:
         uq_df = pd.DataFrame(uq_rows)
-        uq_df.to_csv(out / 'reports' / 'v4_uncertainty.csv', index=False)
+        uq_df.to_csv(out / 'reports' / 'final_uncertainty.csv', index=False)
         print(uq_df.groupby('client')['correct'].mean().to_string())
 
     # save final artifacts
     torch.save({'global_body': global_body.state_dict(),
                 'nets': {cid: nets[cid].state_dict() for cid in nets}},
-               out / 'models' / 'fedua_net_v4_final.pt')
-    with open(out / 'reports' / 'v4_meta.json', 'w') as f:
+               out / 'models' / 'fedua_net_final.pt')
+    with open(out / 'reports' / 'final_meta.json', 'w') as f:
         json.dump({'classes': classes, 'agg_weights': {str(k): v for k, v in agg_w.items()},
                    'rounds': cfg.COMM_ROUNDS, 'batch': cfg.BATCH_SIZE,
                    'elapsed_sec': time.time() - t_start,

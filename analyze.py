@@ -9,7 +9,7 @@ import pandas as pd
 from scipy import stats
 
 _ap = argparse.ArgumentParser()
-_ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_tier1')
+_ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_experiments')
 OUT = Path(_ap.parse_args().out)
 RAW = OUT / 'raw'
 REP = OUT / 'reports'
@@ -143,7 +143,7 @@ if cal_files:
 summary.to_csv(REP / 'summary.csv')
 per_client.to_csv(REP / 'per_client_metrics.csv', index=False)
 wil.to_csv(REP / 'wilcoxon_vs_baselines.csv', index=False)
-with open(REP / 'tier1_report.txt', 'w') as f:
+with open(REP / 'experiment_report.txt', 'w') as f:
     f.write('FEDUA-NET TIER-1 REPORT\n' + '=' * 70 + '\n\n')
     f.write('Mean-client accuracy by strategy (mean & std across seeds):\n')
     f.write(summary.to_string() + '\n\n')

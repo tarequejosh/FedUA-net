@@ -26,27 +26,27 @@ A cross-silo federated learning system where 3 hospitals each hold a completely 
 ## Current Status (as of 2026-08-14)
 
 ### COMPLETED
-- v4 architecture implemented and trained: `fedua_net_v4_pytorch.py`
+- Final architecture implemented and trained: `fedua_net.py`
   - EfficientNetV2-S backbone + CBAM + GAP + PReLU + MC-Dropout(0.30)
   - FedPer: per-client LocalHead (shared body federated, heads are local)
   - FedBN-style: BatchNorm excluded from server averaging
   - 10 federated rounds + post-personalization fine-tune
-- Final results (in `outputs_v4/`):
+- Final results (in `outputs_final/`):
   - C0 Brain MRI:   acc=0.9606, F1=0.9601, AUC=0.982
   - C1 Breast US:   acc=0.7778, F1=0.7787, AUC=0.922
   - C2 COVID X-ray: acc=0.9528, F1=0.9573, AUC=0.990
   - Mean: acc=0.8971, macro-F1=0.8987
   - vs v1 global baseline: +24.5% acc, +39.7% F1
-- Tier-1 experiment harness implemented: `tier1_v2.py`
+- Tier-1 experiment harness implemented: `experiment.py`
   - 8 strategies: FedAvg, FedBN, FedProx, FedBABU, Ditto, Local-only, Centralized, FedUA
   - Multi-seed (3 seeds), temperature scaling, conformal prediction (APS), risk-coverage curves
   - --resume flag to restart interrupted runs safely
   - Smoke-tested PASS (2026-08-14, runs clean on RTX 5060 CUDA)
-- Partial baseline results from seeds {0,1} already in `outputs_tier1/raw/`
+- Partial baseline results from seeds {0,1} already in `outputs_experiments/raw/`
 
 ### IN PROGRESS / TODO
-1. Run full 3-seed experiment (tier1_v2.py, seeds 0-2, 12 rounds, ~10-12 GPU hours)
-2. Run Wilcoxon analysis (analyze_tier1.py after raw/ is fully populated)
+1. Run full 3-seed experiment (experiment.py, seeds 0-2, 12 rounds, ~10-12 GPU hours)
+2. Run Wilcoxon analysis (analyze.py after raw/ is fully populated)
 3. LOCO run (--loco flag, fedua strategy, 3 seeds)
 4. Write the paper (all sections, figures, LaTeX)
 
@@ -81,14 +81,14 @@ Uncertainty: MC-Dropout with entropy as uncertainty signal; calibrated with temp
 ```
 FedUA-Net/
 |
-+-- fedua_net_v4_pytorch.py     CORE: architecture, data loading, training primitives
++-- fedua_net.py     CORE: architecture, data loading, training primitives
 |                                Classes: SharedBody, LocalHead, ClientNet, CBAM
 |                                Functions: discover_all(), build_loaders(), client_meta()
 |                                Config: cfg (dataclass with all hyperparameters)
 |
-+-- tier1_v2.py                 MAIN EXPERIMENT HARNESS (run this for paper results)
++-- experiment.py                 MAIN EXPERIMENT HARNESS (run this for paper results)
 |                                Implements all 8 strategies under one fixed architecture
-|                                Writes per-(seed,strategy) CSVs to outputs_tier1/raw/
+|                                Writes per-(seed,strategy) CSVs to outputs_experiments/raw/
 |                                Also runs: temperature scaling, conformal APS, risk-coverage
 |                                KEY ARGS:
 |                                  --strategies fedavg fedbn fedprox fedbabu ditto
@@ -99,9 +99,9 @@ FedUA-Net/
 |                                  --loco          (leave-one-client-out)
 |                                  --resume        (restart-safe)
 |
-+-- analyze_tier1.py            ANALYSIS: aggregate raw/ -> summary + Wilcoxon p-values
-|                                Run AFTER tier1_v2.py completes
-|                                Writes to outputs_tier1/reports/
++-- analyze.py            ANALYSIS: aggregate raw/ -> summary + Wilcoxon p-values
+|                                Run AFTER experiment.py completes
+|                                Writes to outputs_experiments/reports/
 |
 +-- personalize_finetune.py     Post-FL per-client fine-tune script
 |                                Loads checkpoint_r10.pt, fine-tunes, saves finetuned.pt
@@ -110,31 +110,31 @@ FedUA-Net/
 |
 +-- parse_curves.py             Utility: rebuild training-curves figure from log
 |
-+-- outputs_v1_baseline_report.txt   v1 TF baseline (FedAvg global, acc=0.6517)
++-- baseline_report.txt   v1 TF baseline (FedAvg global, acc=0.6517)
 |                                     KEEP: cited as prior work in the paper
 |
-+-- outputs_v4/                 AUTHORITATIVE v4 results
++-- outputs_final/                 AUTHORITATIVE v4 results
 |   +-- models/
 |   |   +-- checkpoint_r10.pt           Final federated phase (10 rounds)
-|   |   +-- fedua_net_v4_finetuned.pt   Final published weights (post fine-tune)
+|   |   +-- fedua_net_finetuned.pt   Final published weights (post fine-tune)
 |   +-- reports/
-|   |   +-- v4_final_report.txt         KEY RESULTS FILE (acc, F1, AUC per client)
-|   |   +-- v4_final_client_summary.csv Per-client summary
-|   |   +-- v4_final_per_class.csv      Per-class breakdown
-|   |   +-- v4_final_uncertainty.csv    MC entropy per sample
-|   |   +-- v4_vs_prior.csv             Comparison with v1 baseline
-|   |   +-- v4_fed_log.csv              Per-round training curves
-|   |   +-- v4_meta.json                Run metadata
+|   |   +-- final_report.txt         KEY RESULTS FILE (acc, F1, AUC per client)
+|   |   +-- final_client_summary.csv Per-client summary
+|   |   +-- final_per_class.csv      Per-class breakdown
+|   |   +-- final_uncertainty.csv    MC entropy per sample
+|   |   +-- final_vs_prior.csv             Comparison with v1 baseline
+|   |   +-- final_fed_log.csv              Per-round training curves
+|   |   +-- final_meta.json                Run metadata
 |   +-- figures/
-|       +-- v4_training_curves.png      Per-round per-client accuracy plot
+|       +-- final_training_curves.png      Per-round per-client accuracy plot
 |
-+-- outputs_tier1/              GROWING: multi-seed baseline ladder results
-|   +-- raw/                    Per-(strategy,seed) CSVs from tier1_v2.py
++-- outputs_experiments/              GROWING: multi-seed baseline ladder results
+|   +-- raw/                    Per-(strategy,seed) CSVs from experiment.py
 |   |   +-- raw_{strategy}_seed{n}.csv  Main metrics (acc,f1,mcc,auc,ece,brier)
 |   |   +-- cal_fedua_seed{n}.csv       Calibration + conformal + risk-coverage
 |   |   +-- cal_fedbn_seed{n}.csv
 |   |   +-- loco_seed{n}.csv            LOCO results (if --loco was run)
-|   +-- reports/                Generated by analyze_tier1.py
+|   +-- reports/                Generated by analyze.py
 |       +-- summary.csv                 Mean+-std per strategy (main paper table)
 |       +-- per_client_metrics.csv      Per-client breakdown
 |       +-- wilcoxon_vs_baselines.csv   p-values (FedUA vs each baseline)
@@ -161,7 +161,7 @@ Python: conda env "research"
         Python 3.11, PyTorch 2.11.0+cu128, pandas 3.0.3
 
 Launch pattern:
-  conda run -n research python tier1_v2.py [args]
+  conda run -n research python experiment.py [args]
 
 CRITICAL Windows notes:
   - num_workers must be <= 4 (8 -> WinError 1455 paging file error)
@@ -174,7 +174,7 @@ CRITICAL Windows notes:
 
 ## Key Results Reference
 
-### v4 Final Results (post fine-tune, single seed)
+### Final Results (post fine-tune, single seed)
 
 | Client | Acc | Precision | Recall | F1 | AUC |
 |--------|-----|-----------|--------|-----|-----|
@@ -183,14 +183,14 @@ CRITICAL Windows notes:
 | C2 COVID X-ray | 0.9528 | 0.967 | 0.9490 | 0.9573 | 0.990 |
 | Mean | 0.8971 | | | 0.8987 | |
 
-### Baseline Ladder (2-seed partial, from outputs_tier1/raw/)
+### Baseline Ladder (2-seed partial, from outputs_experiments/raw/)
 
 | Method | Mean Acc | Mean F1 | Mean MCC |
 |--------|----------|---------|---------|
 | Ditto | 0.932 | 0.929 | 0.891 |
 | Centralized (upper bound) | 0.930 | 0.921 | 0.889 |
 | Local-only | 0.917 | 0.915 | 0.872 |
-| FedUA-v4 | 0.917 | 0.911 | 0.872 |
+| FedUA-Final | 0.917 | 0.911 | 0.872 |
 | FedBABU | 0.890 | 0.884 | 0.825 |
 | FedProx | 0.834 | 0.819 | 0.727 |
 | FedBN | 0.821 | 0.807 | 0.712 |
@@ -225,33 +225,33 @@ Three contributions:
 
 ```bash
 # 1. Full 3-seed experiment (~10-12 hours)
-conda run -n research python tier1_v2.py --strategies fedavg fedbn fedprox fedbabu ditto local_only centralized fedua --seeds 0 1 2 --rounds 12 --batch 32 --resume
+conda run -n research python experiment.py --strategies fedavg fedbn fedprox fedbabu ditto local_only centralized fedua --seeds 0 1 2 --rounds 12 --batch 32 --resume
 
 # 2. Analysis (after step 1 completes)
-conda run -n research python analyze_tier1.py
+conda run -n research python analyze.py
 
 # 3. LOCO generalization
-conda run -n research python tier1_v2.py --strategies fedua --seeds 0 1 2 --rounds 12 --batch 32 --loco --resume
+conda run -n research python experiment.py --strategies fedua --seeds 0 1 2 --rounds 12 --batch 32 --loco --resume
 ```
 
 ---
 
 ## What NOT To Do
 
-- Do NOT edit fedua_net_v4_pytorch.py architecture -- it is the stable published baseline
-- Do NOT re-run personalize_finetune.py -- final weights already saved as fedua_net_v4_finetuned.pt
+- Do NOT edit fedua_net.py architecture -- it is the stable published baseline
+- Do NOT re-run personalize_finetune.py -- final weights already saved as fedua_net_finetuned.pt
 - Do NOT add MedMNIST (derma/retina) clients -- v5 was dropped; this is a 3-client paper
 - Do NOT use Start-Process to launch Python on Windows -- use conda run -n research python
 - Do NOT enable AMP/fp16 -- causes NaN in evaluation metrics
 - Do NOT set num_workers > 4 -- causes WinError 1455 on Windows
-- Do NOT delete outputs_v1_baseline_report.txt -- it is cited as prior work
+- Do NOT delete baseline_report.txt -- it is cited as prior work
 
 ---
 
 ## Uncertainty Interpretation (for paper)
 
 MC-Dropout entropy correctly correlates with prediction errors.
-Columns in v4_final_uncertainty.csv: correct=0 means WRONG prediction,
+Columns in final_uncertainty.csv: correct=0 means WRONG prediction,
 correct=1 means RIGHT prediction.
 Correct samples (col=1) have LOWER entropy than incorrect (col=0) on all clients.
 This entropy-based uncertainty can gate referrals/abstention -- strong clinical story.

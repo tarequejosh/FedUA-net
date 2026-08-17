@@ -11,7 +11,7 @@
 #   - Leave-one-client-out (LOCO) unseen-site generalization
 #   - Per-client conformal prediction (APS) + risk-coverage curves
 #
-# Raw per-(seed,strategy) results are saved to outputs_tier1/raw/.
+# Raw per-(seed,strategy) results are saved to outputs_experiments/raw/.
 # Cross-seed stats / Wilcoxon are computed by analyze_tier1.py.
 # ============================================================
 import os, sys, time, json, copy, random, argparse, contextlib
@@ -27,7 +27,7 @@ import torchvision
 from torch.utils.data import Dataset, DataLoader
 
 sys.path.insert(0, r'D:/Research/FedUA-Net')
-import fedua_net_v4_pytorch as m
+import fedua_net as m
 
 os.environ.setdefault('TORCH_HOME', r'D:/Research/FedUA-Net/.torch_cache')
 
@@ -48,7 +48,7 @@ def parse_args():
     ap.add_argument('--batch', type=int, default=32)
     ap.add_argument('--smoke', action='store_true')
     ap.add_argument('--loco', action='store_true', help='run LOCO generalization')
-    ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_tier1')
+    ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_experiments')
     ap.add_argument('--resume', action='store_true',
                     help='skip strategies whose raw CSV already exists for a given seed')
     return ap.parse_args()
