@@ -1,0 +1,37 @@
+device=cuda
+[OK] checkpoint loaded
+  C0 fine-tune train acc=0.9968
+  C1 fine-tune train acc=0.9761
+  C2 fine-tune train acc=0.9813
+========================================================================
+  FINAL FEDUA-NET v4 RESULTS (personalized + fine-tuned)
+========================================================================
+
+  Hospital_A (Brain-Tumor MRI): Acc=0.9606  F1=0.9601  AUC=0.9823  P=0.9621  R=0.9606
+
+  Hospital_B (Breast Ultrasound): Acc=0.7778  F1=0.7787  AUC=0.9221  P=0.7631  R=0.8055
+
+  Hospital_C (COVID-19 X-Ray): Acc=0.9528  F1=0.9573  AUC=0.9896  P=0.9668  R=0.9490
+
+ client                           name  accuracy  precision   recall       f1      auc
+      0   Hospital_A (Brain-Tumor MRI)  0.960625   0.962052 0.960625 0.960070 0.982258
+      1 Hospital_B (Breast Ultrasound)  0.777778   0.763063 0.805539 0.778713 0.922138
+      2    Hospital_C (COVID-19 X-Ray)  0.952756   0.966755 0.948967 0.957314 0.989606
+
+MEAN client accuracy = 0.8971   macro-F1 = 0.8987
+
+============================================================
+                                   Model  Accuracy  Macro-F1
+          FedUA-Net v1 global FL (prior)  0.651700  0.501600
+    MobileNetV2 centralized (prior best)  0.764300  0.713300
+FedUA-Net v4 personalized FL (+finetune)  0.897053  0.898699
+============================================================
+
+[MC] uncertainty estimation ...
+correct                                0         1
+client                                            
+Hospital_A (Brain-Tumor MRI)    0.719880  0.619382
+Hospital_B (Breast Ultrasound)  0.682332  0.411195
+Hospital_C (COVID-19 X-Ray)     0.674827  0.351061
+
+[OK] done -> D:/Research/FedUA-Net/outputs_v4

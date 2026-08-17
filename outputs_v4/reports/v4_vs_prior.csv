@@ -1,0 +1,4 @@
+Model,Accuracy,Macro-F1
+FedUA-Net v1 global FL (prior),0.6517,0.5016
+MobileNetV2 centralized (prior best),0.7643,0.7133
+FedUA-Net v4 personalized FL (+finetune),0.8970528944298629,0.8986989980183416

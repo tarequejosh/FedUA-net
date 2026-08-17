@@ -1,0 +1,71 @@
+<mxfile host="Electron" modified="2026-08-17T00:00:00.000Z" agent="Mozilla/5.0" version="20.0.0" type="device">
+  <diagram id="fedua_methodology" name="FedUA-Net Architecture">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Central Server Box -->
+        <mxCell id="server_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;dashPattern=1 2;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="350" y="100" width="450" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="server_label" value="&lt;b&gt;Global Cloud Server&lt;/b&gt;&lt;br&gt;FedUA-Net Aggregate Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="360" y="110" width="430" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Hospital A -->
+        <mxCell id="hosp_a" value="&lt;b&gt;Hospital A&lt;/b&gt;&lt;br&gt;Brain MRI&lt;br&gt;(4 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="130" width="160" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Hospital B -->
+        <mxCell id="hosp_b" value="&lt;b&gt;Hospital B&lt;/b&gt;&lt;br&gt;Breast US&lt;br&gt;(3 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="50" y="240" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Hospital C -->
+        <mxCell id="hosp_c" value="&lt;b&gt;Hospital C&lt;/b&gt;&lt;br&gt;COVID X-Ray&lt;br&gt;(4 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="160" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Central Components -->
+        <mxCell id="comp_enet" value="&lt;b&gt;Shared Body&lt;/b&gt;&lt;br&gt;EfficientNetV2-S&lt;br&gt;(FedAvg without BN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="380" y="240" width="130" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comp_cbam" value="&lt;b&gt;Attention&lt;/b&gt;&lt;br&gt;CBAM Module" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="530" y="240" width="100" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="comp_uq" value="&lt;b&gt;Uncertainty&lt;/b&gt;&lt;br&gt;MC-Dropout (0.30)&lt;br&gt;Temp. Scaling &amp; APS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="650" y="240" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows from Hospitals to Server -->
+        <mxCell id="arrow_a" edge="1" parent="1" source="hosp_a" target="server_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_b" edge="1" parent="1" source="hosp_b" target="comp_enet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_c" edge="1" parent="1" source="hosp_c" target="server_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Internal Arrows -->
+        <mxCell id="arrow_int1" edge="1" parent="1" source="comp_enet" target="comp_cbam">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_int2" edge="1" parent="1" source="comp_cbam" target="comp_uq">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Local Head note -->
+        <mxCell id="local_head_note" value="*Local Classification Heads (FedPer-style) remain at each Hospital" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="400" y="400" width="350" height="30" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

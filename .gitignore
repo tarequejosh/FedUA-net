@@ -1,0 +1,22 @@
+# Datasets
+Dataset/
+outputs_v4/models/*.pt
+outputs_tier1/models/*.pt
+
+# Python caches
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+
+# IDE and Environment
+.vscode/
+.torch_cache/
+.idea/
+venv/
+env/
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db

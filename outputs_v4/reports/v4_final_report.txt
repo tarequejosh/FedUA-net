@@ -1,0 +1,36 @@
+FEDUA-NET v4 FINAL REPORT (publication)
+======================================================================
+ client                           name  accuracy  precision   recall       f1      auc
+      0   Hospital_A (Brain-Tumor MRI)  0.960625   0.962052 0.960625 0.960070 0.982258
+      1 Hospital_B (Breast Ultrasound)  0.777778   0.763063 0.805539 0.778713 0.922138
+      2    Hospital_C (COVID-19 X-Ray)  0.952756   0.966755 0.948967 0.957314 0.989606
+
+Mean client accuracy = 0.8971
+Mean client macro-F1 = 0.8987
+
+Comparison vs prior work:
+                                   Model  Accuracy  Macro-F1
+          FedUA-Net v1 global FL (prior)  0.651700  0.501600
+    MobileNetV2 centralized (prior best)  0.764300  0.713300
+FedUA-Net v4 personalized FL (+finetune)  0.897053  0.898699
+
+Per-class:
+                        client           class  precision   recall       f1  support
+  Hospital_A (Brain-Tumor MRI)       bt_glioma   0.991477 0.872500 0.928191    400.0
+  Hospital_A (Brain-Tumor MRI)   bt_meningioma   0.923810 0.970000 0.946341    400.0
+  Hospital_A (Brain-Tumor MRI)      bt_notumor   0.950119 1.000000 0.974421    400.0
+  Hospital_A (Brain-Tumor MRI)    bt_pituitary   0.982801 1.000000 0.991326    400.0
+Hospital_B (Breast Ultrasound)       bu_benign   0.875000 0.742424 0.803279     66.0
+Hospital_B (Breast Ultrasound)    bu_malignant   0.631579 0.774194 0.695652     31.0
+Hospital_B (Breast Ultrasound)       bu_normal   0.782609 0.900000 0.837209     20.0
+   Hospital_C (COVID-19 X-Ray)        cr_covid   0.992523 0.979705 0.986072    542.0
+   Hospital_C (COVID-19 X-Ray) cr_lung_opacity   0.965476 0.899113 0.931114    902.0
+   Hospital_C (COVID-19 X-Ray)       cr_normal   0.929639 0.976455 0.952472   1529.0
+   Hospital_C (COVID-19 X-Ray)    cr_pneumonia   0.979381 0.940594 0.959596    202.0
+
+Uncertainty (mean entropy):
+correct                                0         1
+client                                            
+Hospital_A (Brain-Tumor MRI)    0.719880  0.619382
+Hospital_B (Breast Ultrasound)  0.682332  0.411195
+Hospital_C (COVID-19 X-Ray)     0.674827  0.351061
