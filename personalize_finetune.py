@@ -1,4 +1,4 @@
-"""FedUA-Net v4 - post-FL personalization fine-tune + final publication eval.
+"""FedUA-Net - post-FL personalization fine-tune + final publication eval.
 
 Loads the federated checkpoint, then fine-tunes each client's personalized
 network on its own local data (standard FedPer practice) and produces the
@@ -16,7 +16,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, r'D:/Research/FedUA-Net')
-import fedua_net_v4_pytorch as m
+import fedua_net as m
 
 SEED = 42
 torch.manual_seed(SEED); np.random.seed(SEED)
@@ -77,7 +77,7 @@ for cid in range(m.cfg.NUM_CLIENTS):
 
 # ---- final eval ----
 print('=' * 72)
-print('  FINAL FEDUA-NET v4 RESULTS (personalized + fine-tuned)')
+print('  FINAL FEDUA-NET RESULTS (personalized + fine-tuned)')
 print('=' * 72)
 from sklearn.metrics import classification_report
 summary, per_class_rows = [], []
@@ -109,21 +109,21 @@ print(f'\nMEAN client accuracy = {mean_acc:.4f}   macro-F1 = {mean_f1:.4f}')
 prior = pd.DataFrame([
     {'Model': 'FedUA-Net v1 global FL (prior)', 'Accuracy': 0.6517, 'Macro-F1': 0.5016},
     {'Model': 'MobileNetV2 centralized (prior best)', 'Accuracy': 0.7643, 'Macro-F1': 0.7133},
-    {'Model': 'FedUA-Net v4 personalized FL (+finetune)', 'Accuracy': mean_acc, 'Macro-F1': mean_f1},
+    {'Model': 'FedUA-Net personalized FL (+finetune)', 'Accuracy': mean_acc, 'Macro-F1': mean_f1},
 ])
 print('\n' + '=' * 60)
 print(prior.to_string(index=False))
 print('=' * 60)
 
 # ---- save ----
-sdf.to_csv(os.path.join(OUT, 'reports', 'v4_final_client_summary.csv'), index=False)
-pcdf.to_csv(os.path.join(OUT, 'reports', 'v4_final_per_class.csv'), index=False)
-prior.to_csv(os.path.join(OUT, 'reports', 'v4_vs_prior.csv'), index=False)
+sdf.to_csv(os.path.join(OUT, 'reports', 'final_client_summary.csv'), index=False)
+pcdf.to_csv(os.path.join(OUT, 'reports', 'final_per_class.csv'), index=False)
+prior.to_csv(os.path.join(OUT, 'reports', 'final_vs_prior.csv'), index=False)
 torch.save({'nets': {str(cid): nets[cid].state_dict() for cid in nets}},
-           os.path.join(OUT, 'models', 'fedua_net_v4_finetuned.pt'))
+           os.path.join(OUT, 'models', 'fedua_net_finetuned.pt'))
 
 # curves figure from fed log
-log = pd.read_csv(os.path.join(OUT, 'reports', 'v4_fed_log.csv'))
+log = pd.read_csv(os.path.join(OUT, 'reports', 'final_fed_log.csv'))
 plt.style.use('seaborn-v0_8-whitegrid')
 cols = ['#1976D2', '#F57C00', '#388E3C']
 fig, ax = plt.subplots(figsize=(9, 5))
@@ -132,10 +132,10 @@ for c in range(3):
     ax.plot(log['round'], log[f'c{c}_test_acc'], '--', marker='s', ms=4,
             color=cols[c], label=m.client_meta(c)[3])
 ax.set_xlabel('Communication round'); ax.set_ylabel('Accuracy')
-ax.set_title('FedUA-Net v4 - federated learning progress', fontweight='bold')
+ax.set_title('FedUA-Net - federated learning progress', fontweight='bold')
 ax.legend(fontsize=8); ax.set_xticks(log['round'])
 plt.tight_layout()
-fig.savefig(os.path.join(OUT, 'figures', 'v4_training_curves.png'), dpi=200)
+fig.savefig(os.path.join(OUT, 'figures', 'final_training_curves.png'), dpi=200)
 
 # uncertainty (MC dropout)
 print('\n[MC] uncertainty estimation ...')
@@ -155,12 +155,12 @@ for cid in range(m.cfg.NUM_CLIENTS):
         rows.append({'client': m.client_meta(cid)[3], 'correct': ok[i],
                      'entropy': uq['entropy'][i], 'uncertainty': uq['uncertainty'][i]})
 uqdf = pd.DataFrame(rows)
-uqdf.to_csv(os.path.join(OUT, 'reports', 'v4_final_uncertainty.csv'), index=False)
+uqdf.to_csv(os.path.join(OUT, 'reports', 'final_uncertainty.csv'), index=False)
 g = uqdf.groupby(['client', 'correct'])['entropy'].mean().unstack()
 print(g.to_string())
 
-with open(os.path.join(OUT, 'reports', 'v4_final_report.txt'), 'w') as f:
-    f.write('FEDUA-NET v4 FINAL REPORT (publication)\n')
+with open(os.path.join(OUT, 'reports', 'final_report.txt'), 'w') as f:
+    f.write('FEDUA-NET FINAL REPORT (publication)\n')
     f.write('=' * 70 + '\n')
     f.write(sdf.to_string(index=False) + '\n')
     f.write(f'\nMean client accuracy = {mean_acc:.4f}\n')

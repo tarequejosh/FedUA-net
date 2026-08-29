@@ -1,70 +1,161 @@
+<?xml version="1.0" ?>
 <mxfile host="Electron" modified="2026-08-17T00:00:00.000Z" agent="Mozilla/5.0" version="20.0.0" type="device">
-  <diagram id="fedua_methodology" name="FedUA-Net Architecture">
-    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+  <diagram id="fedua_pro" name="FedUA-Net Professional">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        
-        <!-- Central Server Box -->
-        <mxCell id="server_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;dashPattern=1 2;arcSize=4;" vertex="1" parent="1">
-          <mxGeometry x="350" y="100" width="450" height="350" as="geometry" />
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="g_client" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fafb;strokeColor=#e5e7eb;dashed=1;dashPattern=1 4;arcSize=4;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="100" width="560" height="360" as="geometry"/>
         </mxCell>
-        <mxCell id="server_label" value="&lt;b&gt;Global Cloud Server&lt;/b&gt;&lt;br&gt;FedUA-Net Aggregate Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
-          <mxGeometry x="360" y="110" width="430" height="30" as="geometry" />
+        <mxCell id="g_client_label" value="Local Client Training (Shared Body)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="210" y="110" width="300" height="30" as="geometry"/>
         </mxCell>
-
-        <!-- Hospital A -->
-        <mxCell id="hosp_a" value="&lt;b&gt;Hospital A&lt;/b&gt;&lt;br&gt;Brain MRI&lt;br&gt;(4 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="50" y="130" width="160" height="70" as="geometry" />
+        <mxCell id="g_server" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fafb;strokeColor=#e5e7eb;dashed=1;dashPattern=1 4;arcSize=4;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="800" y="100" width="240" height="360" as="geometry"/>
         </mxCell>
-        
-        <!-- Hospital B -->
-        <mxCell id="hosp_b" value="&lt;b&gt;Hospital B&lt;/b&gt;&lt;br&gt;Breast US&lt;br&gt;(3 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="50" y="240" width="160" height="70" as="geometry" />
+        <mxCell id="g_server_label" value="Global Server Aggregation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="810" y="110" width="200" height="30" as="geometry"/>
         </mxCell>
-
-        <!-- Hospital C -->
-        <mxCell id="hosp_c" value="&lt;b&gt;Hospital C&lt;/b&gt;&lt;br&gt;COVID X-Ray&lt;br&gt;(4 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="50" y="350" width="160" height="70" as="geometry" />
+        <mxCell id="g_inf" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fafb;strokeColor=#e5e7eb;dashed=1;dashPattern=1 4;arcSize=4;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="480" width="400" height="160" as="geometry"/>
         </mxCell>
-
-        <!-- Central Components -->
-        <mxCell id="comp_enet" value="&lt;b&gt;Shared Body&lt;/b&gt;&lt;br&gt;EfficientNetV2-S&lt;br&gt;(FedAvg without BN)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="380" y="240" width="130" height="70" as="geometry" />
+        <mxCell id="g_inf_label" value="Uncertainty &amp; Calibration (Post-FL)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="210" y="490" width="300" height="30" as="geometry"/>
         </mxCell>
-
-        <mxCell id="comp_cbam" value="&lt;b&gt;Attention&lt;/b&gt;&lt;br&gt;CBAM Module" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="530" y="240" width="100" height="70" as="geometry" />
+        <mxCell id="g_res" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f9fafb;strokeColor=#e5e7eb;dashed=1;dashPattern=1 4;arcSize=4;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="620" y="480" width="420" height="160" as="geometry"/>
         </mxCell>
-
-        <mxCell id="comp_uq" value="&lt;b&gt;Uncertainty&lt;/b&gt;&lt;br&gt;MC-Dropout (0.30)&lt;br&gt;Temp. Scaling &amp; APS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="650" y="240" width="120" height="70" as="geometry" />
+        <mxCell id="g_res_label" value="Clinical Deployment Results" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="630" y="490" width="300" height="30" as="geometry"/>
         </mxCell>
-
-        <!-- Arrows from Hospitals to Server -->
-        <mxCell id="arrow_a" edge="1" parent="1" source="hosp_a" target="server_box">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="title" value="FedUA-Net: Methodology &amp; Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#111827;" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="840" height="40" as="geometry"/>
         </mxCell>
-        <mxCell id="arrow_b" edge="1" parent="1" source="hosp_b" target="comp_enet">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="d_label" value="Multi-Modal Datasets" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#4b5563;" vertex="1" parent="1">
+          <mxGeometry x="30" y="110" width="160" height="30" as="geometry"/>
         </mxCell>
-        <mxCell id="arrow_c" edge="1" parent="1" source="hosp_c" target="server_box">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="d0" value="&lt;b&gt;Hospital A&lt;/b&gt;&lt;br&gt;Brain MRI&lt;br&gt;(4 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#bae6fd;fontColor=#0369a1;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="150" width="130" height="60" as="geometry"/>
         </mxCell>
-
-        <!-- Internal Arrows -->
-        <mxCell id="arrow_int1" edge="1" parent="1" source="comp_enet" target="comp_cbam">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="d1" value="&lt;b&gt;Hospital B&lt;/b&gt;&lt;br&gt;Breast US&lt;br&gt;(3 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#bae6fd;fontColor=#0369a1;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="250" width="130" height="60" as="geometry"/>
         </mxCell>
-        <mxCell id="arrow_int2" edge="1" parent="1" source="comp_cbam" target="comp_uq">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="d2" value="&lt;b&gt;Hospital C&lt;/b&gt;&lt;br&gt;COVID X-Ray&lt;br&gt;(4 Classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#bae6fd;fontColor=#0369a1;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="40" y="350" width="130" height="60" as="geometry"/>
         </mxCell>
-
-        <!-- Local Head note -->
-        <mxCell id="local_head_note" value="*Local Classification Heads (FedPer-style) remain at each Hospital" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="400" y="400" width="350" height="30" as="geometry" />
+        <mxCell id="f1" value="&lt;b&gt;EfficientNetV2-S&lt;/b&gt;&lt;br&gt;ImageNet Pretrained" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3f4f6;strokeColor=#d1d5db;fontColor=#374151;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="220" y="250" width="130" height="60" as="geometry"/>
         </mxCell>
-        
+        <mxCell id="f2" value="&lt;b&gt;CBAM&lt;/b&gt;&lt;br&gt;Attention" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eef2ff;strokeColor=#c7d2fe;fontColor=#4338ca;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="380" y="250" width="80" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="f3" value="&lt;b&gt;GAP + Dense&lt;/b&gt;&lt;br&gt;PReLU" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3f4f6;strokeColor=#d1d5db;fontColor=#374151;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="490" y="250" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="f4" value="&lt;b&gt;MC-Dropout&lt;/b&gt;&lt;br&gt;(0.30)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff1f2;strokeColor=#fecdd3;fontColor=#be123c;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="620" y="250" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="head" value="&lt;b&gt;Local Head&lt;/b&gt;&lt;br&gt;Client Softmax" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#faf5ff;strokeColor=#e9d5ff;fontColor=#7e22ce;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="620" y="370" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="s1" value="&lt;b&gt;FedAvg&lt;/b&gt;&lt;br&gt;Excluded BatchNorm&lt;br&gt;(FedBN-style for&lt;br&gt;Domain Shift)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#fde68a;fontColor=#b45309;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="830" y="240" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="u1" value="&lt;b&gt;MC-Dropout&lt;/b&gt;&lt;br&gt;Entropy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff1f2;strokeColor=#fecdd3;fontColor=#be123c;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="220" y="540" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="u2" value="&lt;b&gt;Temperature&lt;/b&gt;&lt;br&gt;Scaling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff1f2;strokeColor=#fecdd3;fontColor=#be123c;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="350" y="540" width="100" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="u3" value="&lt;b&gt;Conformal&lt;/b&gt;&lt;br&gt;Prediction (APS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff1f2;strokeColor=#fecdd3;fontColor=#be123c;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="480" y="540" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="r1" value="🏆 &lt;b&gt;Mean Accuracy&lt;/b&gt;&lt;br&gt;88.2%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfdf5;strokeColor=#a7f3d0;fontColor=#047857;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="640" y="540" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="r2" value="🛡️ &lt;b&gt;Coverage&lt;/b&gt;&lt;br&gt;&gt;= 99.3%" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfdf5;strokeColor=#a7f3d0;fontColor=#047857;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="770" y="540" width="110" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="r3" value="📉 &lt;b&gt;Zero-Shot&lt;/b&gt;&lt;br&gt;Robust LOCO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfdf5;strokeColor=#a7f3d0;fontColor=#047857;fontFamily=Helvetica;fontSize=12;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="900" y="540" width="120" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_d0" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="d0" target="f1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="180"/>
+              <mxPoint x="190" y="270"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_d1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="d1" target="f1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_d2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="d2" target="f1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="190" y="380"/>
+              <mxPoint x="190" y="290"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_f1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="f1" target="f2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_f2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="f2" target="f3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_f3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="f3" target="f4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_f4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="f4" target="head">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_server1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3b82f6;strokeWidth=2;endArrow=block;endFill=1;dashed=1;dashPattern=1 2;" edge="1" parent="1" source="f4" target="s1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="260"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_inf1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="head" target="u1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="675" y="450"/>
+              <mxPoint x="270" y="450"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_u1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="u1" target="u2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_u2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="u2" target="u3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_res1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="u3" target="r1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_res2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="u3" target="r2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="570"/>
+              <mxPoint x="610" y="510"/>
+              <mxPoint x="825" y="510"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_res3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9ca3af;strokeWidth=1.5;endArrow=block;endFill=1;fontColor=#4b5563;fontSize=11;" edge="1" parent="1" source="u3" target="r3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="610" y="570"/>
+              <mxPoint x="610" y="510"/>
+              <mxPoint x="960" y="510"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="*Shared body weights are sent to server; local heads remain at client." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=2;fontColor=#6b7280;" vertex="1" parent="1">
+          <mxGeometry x="350" y="430" width="400" height="20" as="geometry"/>
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
