@@ -1,0 +1,36 @@
+FEDUA-NET TIER-1 REPORT
+======================================================================
+
+Mean-client accuracy by strategy (mean & std across seeds):
+             acc_mean   acc_std   f1_mean    f1_std  mcc_mean   mcc_std  ece_mean  brier_mean  n_seeds
+strategy                                                                                              
+centralized  0.937846  0.007130  0.929449  0.007679  0.904800  0.014127  0.069750    0.094176        3
+ditto        0.933167  0.012045  0.930555  0.010857  0.894866  0.021158  0.059051    0.102877        3
+local_only   0.924228  0.013608  0.922432  0.015007  0.882208  0.020594  0.047156    0.103782        3
+fedua        0.905212  0.010278  0.899493  0.010284  0.857765  0.012501  0.064563    0.160125        3
+fedbabu      0.892704  0.013219  0.887453  0.014428  0.829900  0.031515  0.061041    0.155317        3
+fedprox      0.836949  0.011382  0.822437  0.014523  0.734455  0.026373  0.066326    0.216120        3
+fedavg       0.826577  0.019350  0.808207  0.024628  0.715791  0.032102  0.076153    0.221081        3
+fedbn        0.821629  0.008190  0.804572  0.011223  0.709295  0.018733  0.079707    0.232219        3
+
+Mean client accuracy per client:
+client            0       1       2  pooled
+strategy                                   
+centralized  0.9631  0.8746  0.9567  0.9569
+ditto        0.9621  0.8832  0.9542     NaN
+fedavg       0.9571  0.5670  0.9557     NaN
+fedbabu      0.9648  0.7578  0.9555     NaN
+fedbn        0.9627  0.5470  0.9552     NaN
+fedprox      0.9648  0.5869  0.9592     NaN
+fedua        0.9610  0.8234  0.9312     NaN
+local_only   0.9629  0.8547  0.9551     NaN
+
+Paired Wilcoxon vs reference:
+reference      method  wilcoxon_W  p_value  delta_acc
+    fedua centralized         0.0 0.108809  -0.032633
+    fedua       ditto         0.0 0.108809  -0.027954
+    fedua      fedavg         0.0 0.108809   0.078636
+    fedua     fedbabu         2.0 0.592980   0.012508
+    fedua       fedbn         0.0 0.108809   0.083583
+    fedua     fedprox         0.0 0.108809   0.068264
+    fedua  local_only         1.0 0.285049  -0.019015

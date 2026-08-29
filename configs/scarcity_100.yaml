@@ -1,0 +1,33 @@
+# Data Scarcity Configuration (N=100 on Hospital B)
+experiment:
+  name: "scarcity_100"
+  description: "Robustness evaluation under extreme sample scarcity (N=100 on Hospital B)"
+  output_dir: "results/verified/scarcity_100"
+  seeds: [0, 1, 2]
+  methods:
+    - "fedua"
+    - "fedbn"
+    - "local_only"
+
+federated:
+  rounds: 12
+  local_epochs: 1
+  agg_weight_type: "uniform"
+
+optimization:
+  optimizer: "AdamW"
+  lr: 0.0001
+  weight_decay: 0.0001
+  batch_size: 32
+
+model:
+  backbone: "efficientnet_v2_s"
+  pretrained: true
+  attention: "cbam"
+  embed_dim: 512
+  local_bn: true
+
+datasets:
+  data_root: "Dataset"
+  hospital_b:
+    subset_size: 100

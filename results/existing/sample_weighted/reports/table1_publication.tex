@@ -1,0 +1,20 @@
+% Table I: Multi-Strategy Federated Learning Performance Comparison
+\begin{table*}[t]
+\centering
+\caption{Quantitative comparison across 3 clinical sites (3-seed mean $\pm$ std). Uncertainty metrics reported with Temperature Scaling; Conformal APS set size evaluated at 90\% target coverage ($\alpha=0.10$).}
+\label{tab:main_results}
+\begin{tabular}{lcccccc}
+\toprule
+Method & Accuracy (\%) & Macro F1 (\%) & MCC & Raw ECE & Calibrated ECE & APS Set Size (\alpha=0.10) \\
+\midrule
+Local_only & 94.14 \pm 0.38 & 93.91 \pm 0.34 & 0.909 & 0.0535 & 0.0315 & 2.01 \\
+Centralized & 93.50 \pm 1.11 & 93.50 \pm 0.95 & 0.897 & 0.0729 & — & — \\
+Ditto & 93.40 \pm 1.29 & 93.22 \pm 1.34 & 0.896 & 0.0601 & 0.0328 & 2.15 \\
+\textbf{FedUA-Net (Ours)} & 92.04 \pm 0.43 & 91.64 \pm 0.56 & 0.875 & 0.0690 & \textbf{0.0397} & 2.25 \\
+Fedbabu & 88.82 \pm 2.03 & 88.18 \pm 2.13 & 0.821 & 0.0696 & 0.0471 & 2.33 \\
+Fedprox & 83.54 \pm 1.27 & 82.00 \pm 1.12 & 0.729 & 0.0708 & 0.0450 & 2.43 \\
+Fedbn & 82.60 \pm 0.89 & 80.59 \pm 1.79 & 0.714 & 0.0847 & 0.0483 & 2.43 \\
+Fedavg & 81.80 \pm 1.54 & 80.06 \pm 2.33 & 0.710 & 0.0780 & 0.1192 & 2.40 \\
+\bottomrule
+\end{tabular}
+\end{table*}

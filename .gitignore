@@ -1,7 +1,31 @@
 # Datasets
 Dataset/
-outputs_v4/models/*.pt
-outputs_tier1/models/*.pt
+data/
+*.pt
+*.pth
+outputs_final/models/
+outputs_experiments/models/
+results/**/models/
+
+# Temporary & backup files
+outputs_experiments/raw_backup_v1/
+outputs_experiments/smoke_test/
+fig1_architecture_*.jpg
+
+# Paper files & drafts (kept local, excluded from git)
+paper.tex
+paper.pdf
+paper_draft/
+
+# LaTeX build intermediate artifacts
+paper.aux
+paper.log
+paper.out
+paper.bbl
+paper.blg
+paper.synctex.gz
+paper.fls
+paper.fdb_latexmk
 
 # Python caches
 __pycache__/

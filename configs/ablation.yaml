@@ -1,0 +1,35 @@
+# Factorial Ablation Configuration
+# 2-factor modular ablation: Attention Module x Personalization Fine-Tuning
+
+experiment:
+  name: "ablation_study"
+  description: "Systematic evaluation of modular inductive biases (CBAM, Spatial, Channel) and personalization fine-tuning"
+  output_dir: "results/tables"
+  seeds: [0, 1, 2]
+  rounds: 10
+  configurations:
+    - name: "FedBN Baseline"
+      attention: "none"
+      local_finetune: false
+    - name: "Base Personalization"
+      attention: "none"
+      local_finetune: true
+    - name: "+ Spatial Attention"
+      attention: "spatial"
+      local_finetune: true
+    - name: "+ Channel Attention"
+      attention: "channel"
+      local_finetune: true
+    - name: "FedUA-Net (Proposed)"
+      attention: "cbam"
+      local_finetune: true
+
+federated:
+  agg_weight_type: "sample_size" # Baseline protocol for ablation sweep
+  local_epochs: 1
+
+optimization:
+  optimizer: "AdamW"
+  lr: 0.0001
+  weight_decay: 0.0001
+  batch_size: 32
