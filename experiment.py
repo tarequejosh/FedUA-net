@@ -44,7 +44,7 @@ m.cfg.LOCAL_EPOCHS = {0: 4, 1: 10, 2: 2}
 # ------------------------------------------------------------
 # CLI
 # ------------------------------------------------------------
-def parse_args():
+def parse_args(cmd_args=None):
     ap = argparse.ArgumentParser()
     ap.add_argument('--data_root', default='./Dataset', help='Path to Dataset root directory')
     ap.add_argument('--strategies', nargs='*', default=[
@@ -69,7 +69,11 @@ def parse_args():
     ap.add_argument('--out', default='./outputs_experiments')
     ap.add_argument('--resume', action='store_true',
                     help='skip strategies whose raw CSV already exists for a given seed')
-    return ap.parse_args()
+    if cmd_args is not None:
+        return ap.parse_args(cmd_args)
+    if __name__ == '__main__':
+        return ap.parse_args()
+    return ap.parse_known_args([])[0]
 
 ARGS = parse_args()
 OUT = Path(ARGS.out)
