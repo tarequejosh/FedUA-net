@@ -115,6 +115,27 @@ class TestUncertaintyAndConformal(unittest.TestCase):
         self.assertTrue(0.0 <= brier <= 1.0)
 
 
+class TestTransforms(unittest.TestCase):
+    def test_speckle_noise(self):
+        import fedua_net as m
+        sn = m.SpeckleNoise(sigma=0.08, p=1.0)
+        x = torch.full((3, 64, 64), 0.5, dtype=torch.float32)
+        out = sn(x)
+        self.assertEqual(out.shape, x.shape)
+        self.assertTrue(torch.all(out >= 0.0) and torch.all(out <= 1.0))
+        self.assertFalse(torch.allclose(out, x))
+
+    def test_ultrasound_transforms(self):
+        import fedua_net as m
+        tf_us = m.train_transforms(ultrasound=True)
+        tf_std = m.train_transforms(ultrasound=False)
+        img = torch.randint(0, 256, (3, 256, 256), dtype=torch.uint8)
+        out_us = tf_us(img)
+        out_std = tf_std(img)
+        self.assertEqual(out_us.shape, (3, m.cfg.IMG_SIZE, m.cfg.IMG_SIZE))
+        self.assertEqual(out_std.shape, (3, m.cfg.IMG_SIZE, m.cfg.IMG_SIZE))
+
+
 def main():
     print("=" * 70)
     print("Running FedUA-Net Unit Test Suite")
@@ -124,6 +145,7 @@ def main():
     suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestModels))
     suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestAggregation))
     suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestUncertaintyAndConformal))
+    suite.addTests(unittest.defaultTestLoader.loadTestsFromTestCase(TestTransforms))
 
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)
@@ -132,3 +154,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

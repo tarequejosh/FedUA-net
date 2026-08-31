@@ -58,11 +58,13 @@ class Config:
     TEMP_TUNE    = True                   # temperature scaling after training
     MC_ITERS     = 30                     # MC dropout forward passes for UQ
     VAL_FRAC     = 0.15                   # brain tumor: val out of train
+    PERSONALIZE_DEEP = False              # CKA-guided: keep attention+fc+prelu local, never aggregated
+    ULTRASOUND_AUG   = False              # Ultrasound-specific augmentations (SpeckleNoise + ElasticTransform) for Hospital B
     SMOKE        = False                  # tiny subset for pipeline test
     AGG_WEIGHT_TYPE = 'uniform'           # 'uniform' (1/K) or 'sample' (N_k/N_total)
     HOSPITAL_B_SUBSET_SIZE = None         # None or int > 0 for data scarcity subsampling
-    DATA_ROOT    = r'D:/Research/FedUA-Net/Dataset'
-    OUTPUT_DIR   = r'D:/Research/FedUA-Net/outputs_final'
+    DATA_ROOT    = os.environ.get('DATA_ROOT', './Dataset')
+    OUTPUT_DIR   = os.environ.get('OUTPUT_DIR', './outputs_final')
 
 cfg = Config()
 
@@ -200,16 +202,37 @@ def discover_all(smoke=False):
 IMG_MEAN = (0.485, 0.456, 0.406)
 IMG_STD = (0.229, 0.224, 0.225)
 
-def train_transforms():
-    return torchvision.transforms.Compose([
+class SpeckleNoise(nn.Module):
+    """Multiplicative speckle noise for ultrasound simulations: x = x + x * N(0, sigma^2)."""
+    def __init__(self, sigma=0.08, p=0.5):
+        super().__init__()
+        self.sigma = sigma
+        self.p = p
+
+    def forward(self, img):
+        if torch.rand(1).item() < self.p:
+            noise = torch.randn_like(img) * self.sigma
+            img = torch.clamp(img + img * noise, 0.0, 1.0)
+        return img
+
+def train_transforms(ultrasound=False):
+    tfs = [
         torchvision.transforms.ConvertImageDtype(torch.float),
         torchvision.transforms.Resize((256, 256), antialias=True),
+    ]
+    if ultrasound:
+        tfs.extend([
+            torchvision.transforms.ElasticTransform(alpha=25.0, sigma=4.0),
+            SpeckleNoise(sigma=0.08, p=0.5),
+        ])
+    tfs.extend([
         torchvision.transforms.RandomResizedCrop(cfg.IMG_SIZE, scale=(0.7, 1.0), antialias=True),
         torchvision.transforms.RandomHorizontalFlip(),
         torchvision.transforms.RandomVerticalFlip(p=0.1),
         torchvision.transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
         torchvision.transforms.Normalize(IMG_MEAN, IMG_STD),
     ])
+    return torchvision.transforms.Compose(tfs)
 
 def eval_transforms():
     return torchvision.transforms.Compose([
@@ -233,20 +256,22 @@ class MedImgDataset(Dataset):
             img = img[:3]
         return self.transform(img), self.labels[i]
 
-def build_loaders(df, batch_size, workers, hospital_b_subset_size=None):
+def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_id=None):
     loaders = {}
+    is_hospital_b = (client_id == 1) or \
+                    ('client' in df.columns and (df['client'] == 1).all()) or \
+                    (len(df) > 0 and 'busi' in str(df['label'].iloc[0]))
+    use_us_aug = is_hospital_b and getattr(cfg, 'ULTRASOUND_AUG', False)
     for split in ('train', 'val', 'test'):
         sub = df[df['split'] == split]
         if len(sub) == 0:
             loaders[split] = None
             continue
-        tf = train_transforms() if split == 'train' else eval_transforms()
+        tf = train_transforms(ultrasound=use_us_aug) if split == 'train' else eval_transforms()
         ds = MedImgDataset(sub, tf)
 
         # Hospital B data scarcity subsampling for training split
         if split == 'train' and hospital_b_subset_size is not None and hospital_b_subset_size > 0:
-            is_hospital_b = ('client' in sub.columns and (sub['client'] == 1).all()) or \
-                            (len(sub) > 0 and 'busi' in str(sub['label'].iloc[0]))
             if is_hospital_b:
                 n_total = len(ds)
                 subset_size = min(int(hospital_b_subset_size), n_total)
@@ -380,7 +405,7 @@ class ClientNet(nn.Module):
         return self.head(v)
 
 # ------------------------------------------------------------
-# Federated weight handling (FedPer + FedBN-style local BN)
+# Federated weight handling (FedPer + FedBN-style local BN + CKA-guided deep personalization)
 # ------------------------------------------------------------
 def bn_param_names(module):
     """Names of params that live inside BatchNorm modules (kept local)."""
@@ -392,39 +417,65 @@ def bn_param_names(module):
                 names.add(prefix + k)
     return names
 
+# Parameter-name prefixes identified by the CKA analysis (Fig. 7) as
+# modality-specific (low cross-client representational alignment).
+# CBAM attention: CKA ~0.694. Final 512-D projection (fc/prelu): CKA ~0.446.
+DEEP_PERSONALIZE_PREFIXES = ('attention.', 'fc.', 'prelu.')
+
+def deep_param_names(module):
+    """Body-level parameter names kept fully local when cfg.PERSONALIZE_DEEP is True.
+    Returns an empty set otherwise (so behavior is unchanged by default and
+    existing 'uniform' runs are unaffected)."""
+    if not getattr(cfg, 'PERSONALIZE_DEEP', False):
+        return set()
+    names = {n for n, _ in module.named_parameters() if n.startswith(DEEP_PERSONALIZE_PREFIXES)}
+    assert len(names) > 0, (
+        "PERSONALIZE_DEEP is True but DEEP_PERSONALIZE_PREFIXES matched zero "
+        "parameters — the prefix list does not match this model's naming. "
+        "Fix DEEP_PERSONALIZE_PREFIXES before proceeding."
+    )
+    return names
+
+def frozen_local_param_names(module):
+    """Union of BatchNorm params + (optionally) CKA-guided deep-personalized params.
+    This is the single source of truth for 'what never crosses the federation boundary'
+    — use it everywhere bn_param_names was previously used for that purpose."""
+    return bn_param_names(module) | deep_param_names(module)
+
 def shared_param_names(module):
     return {n for n, _ in module.named_parameters()}
 
 def copy_shared(src_body, dst_body, keep_bn=True):
-    """Copy shared (non-BN) weights from src_body into dst_body.
-    With keep_bn=True, dst keeps its own BatchNorm (FedBN)."""
-    bn = bn_param_names(dst_body)
+    """Copy shared weights from src_body into dst_body.
+    With keep_bn=True, dst keeps its own BatchNorm (FedBN) and, if cfg.PERSONALIZE_DEEP,
+    its own attention/fc/prelu weights too."""
+    frozen = frozen_local_param_names(dst_body) if keep_bn else set()
     src = src_body.state_dict()
     with torch.no_grad():
         for n, p in dst_body.named_parameters():
-            if n in bn:
+            if n in frozen:
                 continue
             if n in src:
                 p.data.copy_(src[n].data)
 
 def state_dict_excluding_bn(module):
-    bn = bn_param_names(module)
+    frozen = frozen_local_param_names(module)
     sd = module.state_dict()
-    return {k: v for k, v in sd.items() if k not in bn}
+    return {k: v for k, v in sd.items() if k not in frozen}
 
 def weighted_average_bodies(weighted_states, bn_states=None):
-    """weighted_states: list of (weight, state_dict-excluding-BN).
-    Returns averaged non-BN state."""
+    """weighted_states: list of (weight, state_dict-excluding-frozen-local-params).
+    Returns averaged non-frozen state."""
     keys = list(weighted_states[0][1].keys())
     W = sum(w for w, _ in weighted_states)
     avg = {k: sum(w * st[k] for w, st in weighted_states) / W for k in keys}
     return avg
 
 def set_state_dict(module, sd, exclude_bn=False):
-    bn = bn_param_names(module) if exclude_bn else set()
+    frozen = frozen_local_param_names(module) if exclude_bn else set()
     with torch.no_grad():
         for n, p in module.named_parameters():
-            if n in bn or n not in sd:
+            if n in frozen or n not in sd:
                 continue
             p.data.copy_(sd[n].data)
 
@@ -639,7 +690,8 @@ def main():
     print(f'  Aggregation weights ({cfg.AGG_WEIGHT_TYPE}):', {k: round(v, 4) for k, v in agg_w.items()})
 
     loaders = {cid: build_loaders(client_dfs[cid], cfg.BATCH_SIZE, cfg.WORKERS,
-                                  hospital_b_subset_size=cfg.HOSPITAL_B_SUBSET_SIZE)
+                                  hospital_b_subset_size=cfg.HOSPITAL_B_SUBSET_SIZE,
+                                  client_id=cid)
                for cid in range(cfg.NUM_CLIENTS)}
     cweights = {cid: class_weights(client_dfs[cid], hospital_b_subset_size=cfg.HOSPITAL_B_SUBSET_SIZE)
                 for cid in range(cfg.NUM_CLIENTS)}
@@ -682,6 +734,8 @@ def main():
 
         weighted_states = []
         row = {'round': rnd, 'lr_backbone': lr_backbone, 'lr_head': lr_head}
+        if getattr(cfg, 'PERSONALIZE_DEEP', False):
+            print(f"  [CKA-Personalize] Round {rnd:02d}: deep_param_names(nets[1].body) count = {len(deep_param_names(nets[1].body))}")
         for cid in range(cfg.NUM_CLIENTS):
             # broadcast global shared (non-BN) into client, keep local BN
             copy_shared(global_body, nets[cid].body, keep_bn=True)
@@ -689,7 +743,7 @@ def main():
                 nets[cid], loaders[cid], cweights[cid], cfg.LOCAL_EPOCHS[cid],
                 cfg.GRAD_ACCUM, lr_backbone, lr_head, device=device)
             if not check_finite(nets[cid], f'client{cid}'):
-                copy_shared(global_body, nets[cid].body, keep_bn=False)
+                copy_shared(global_body, nets[cid].body, keep_bn=True)
             row[f'c{cid}_tr_acc'] = tra; row[f'c{cid}_val_acc'] = va
             row[f'c{cid}_val_loss'] = vl
             weighted_states.append((agg_w[cid], state_dict_excluding_bn(nets[cid].body)))

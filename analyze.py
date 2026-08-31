@@ -15,12 +15,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy import stats
+from statsmodels.stats.multitest import multipletests
 
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
 _ap = argparse.ArgumentParser()
-_ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_experiments')
+_ap.add_argument('--out', default='./outputs_experiments')
 OUT = Path(_ap.parse_args().out)
 RAW = OUT / 'raw'
 REP = OUT / 'reports'
@@ -119,6 +120,15 @@ def main():
     ref_data = mean_entry[mean_entry['strategy'] == REF].set_index('seed')
     stat_rows = []
     
+    def compute_bootstrap_ci(diff, n_boot=10000, ci=0.95, seed=42):
+        if len(diff) < 2:
+            return float(np.mean(diff)), float(np.mean(diff))
+        rng = np.random.default_rng(seed)
+        boot_means = [float(np.mean(rng.choice(diff, size=len(diff), replace=True))) for _ in range(n_boot)]
+        low = float(np.percentile(boot_means, (1.0 - ci) / 2.0 * 100))
+        high = float(np.percentile(boot_means, (1.0 + ci) / 2.0 * 100))
+        return low, high
+    
     for s in summary.index:
         if s == REF:
             continue
@@ -142,9 +152,12 @@ def main():
             except Exception:
                 w_stat, w_pval = np.nan, np.nan
                 
-        # 95% Confidence Interval of delta
+        # 95% Parametric Confidence Interval of delta
         se = stats.sem(diff) if len(diff) > 1 else 0.0
         ci95 = se * stats.t.ppf((1 + 0.95) / 2., len(diff) - 1) if len(diff) > 1 else 0.0
+        
+        # 95% Bootstrap Confidence Interval (10,000 resamples)
+        boot_low, boot_high = compute_bootstrap_ci(diff, n_boot=10000, ci=0.95)
         
         stat_rows.append({
             'reference': REF,
@@ -152,12 +165,31 @@ def main():
             'delta_acc_pct': float(np.mean(diff) * 100),
             'ci95_low': float((np.mean(diff) - ci95) * 100),
             'ci95_high': float((np.mean(diff) + ci95) * 100),
+            'boot_ci95_low': float(boot_low * 100),
+            'boot_ci95_high': float(boot_high * 100),
             't_statistic': float(t_stat),
             't_pvalue': float(t_pval),
             'wilcoxon_stat': float(w_stat),
             'wilcoxon_pvalue': float(w_pval)
         })
-        print(f"  FedUA-Net vs {s:12s}: Delta Acc = {np.mean(diff)*100:+6.2f}% [95% CI: {(np.mean(diff)-ci95)*100:+5.2f}%, {(np.mean(diff)+ci95)*100:+5.2f}%] | t-pval={t_pval:.4f} | Wilc-pval={w_pval:.4f}")
+
+    # Apply Holm-Bonferroni correction across all pairwise comparisons
+    if stat_rows:
+        t_pvals = [r['t_pvalue'] if not np.isnan(r['t_pvalue']) else 1.0 for r in stat_rows]
+        w_pvals = [r['wilcoxon_pvalue'] if not np.isnan(r['wilcoxon_pvalue']) else 1.0 for r in stat_rows]
+        
+        _, t_pvals_holm, _, _ = multipletests(t_pvals, method='holm')
+        _, w_pvals_holm, _, _ = multipletests(w_pvals, method='holm')
+        
+        for i, row in enumerate(stat_rows):
+            row['t_pvalue_holm'] = float(t_pvals_holm[i])
+            row['wilcoxon_pvalue_holm'] = float(w_pvals_holm[i])
+            s = row['baseline']
+            delta = row['delta_acc_pct']
+            ci_l, ci_h = row['boot_ci95_low'], row['boot_ci95_high']
+            t_p, t_ph = row['t_pvalue'], row['t_pvalue_holm']
+            w_p, w_ph = row['wilcoxon_pvalue'], row['wilcoxon_pvalue_holm']
+            print(f"  FedUA-Net vs {s:12s}: Delta Acc = {delta:+6.2f}% [Boot 95% CI: {ci_l:+5.2f}%, {ci_h:+5.2f}%] | t-pval={t_p:.4f} (Holm: {t_ph:.4f}) | Wilc-pval={w_p:.4f} (Holm: {w_ph:.4f})")
         
     stat_df = pd.DataFrame(stat_rows)
     stat_df.to_csv(REP / 'statistical_significance.csv', index=False)

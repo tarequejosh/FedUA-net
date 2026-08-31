@@ -32,10 +32,10 @@ import torch.nn.functional as F
 import torchvision
 from torch.utils.data import Dataset, DataLoader
 
-sys.path.insert(0, r'D:/Research/FedUA-Net')
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fedua_net as m
 
-os.environ.setdefault('TORCH_HOME', r'D:/Research/FedUA-Net/.torch_cache')
+os.environ.setdefault('TORCH_HOME', str(Path(__file__).resolve().parent / '.torch_cache'))
 
 MTHIS_NUM_CLIENTS = 3   # 3 clients: Brain MRI / Breast US / COVID X-ray
 m.cfg.NUM_CLIENTS = MTHIS_NUM_CLIENTS
@@ -46,6 +46,7 @@ m.cfg.LOCAL_EPOCHS = {0: 4, 1: 10, 2: 2}
 # ------------------------------------------------------------
 def parse_args():
     ap = argparse.ArgumentParser()
+    ap.add_argument('--data_root', default='./Dataset', help='Path to Dataset root directory')
     ap.add_argument('--strategies', nargs='*', default=[
         'fedavg', 'fedbn', 'fedprox', 'fedbabu', 'ditto', 'local_only',
         'centralized', 'fedua'])
@@ -55,11 +56,15 @@ def parse_args():
     ap.add_argument('--attention', default='cbam', choices=['cbam', 'channel', 'spatial', 'none'])
     ap.add_argument('--agg_weight_type', type=str, default='uniform', choices=['uniform', 'sample'],
                     help="Server aggregation weighting: 'uniform' (1/K) or 'sample' (N_k/N_total)")
+    ap.add_argument('--personalize_deep', action='store_true',
+                    help='CKA-guided: keep CBAM attention + projection layer local per client, never aggregated')
+    ap.add_argument('--ultrasound_aug', action='store_true', default=False,
+                    help='Apply ultrasound-specific data augmentations (Speckle noise + Elastic transform) for Hospital B')
     ap.add_argument('--hospital_b_subset_size', type=int, default=0,
                     help="Subsample size for Hospital B training dataset (0 = use all data)")
     ap.add_argument('--smoke', action='store_true')
     ap.add_argument('--loco', action='store_true', help='run LOCO generalization')
-    ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_experiments')
+    ap.add_argument('--out', default='./outputs_experiments')
     ap.add_argument('--resume', action='store_true',
                     help='skip strategies whose raw CSV already exists for a given seed')
     return ap.parse_args()
@@ -74,7 +79,16 @@ RAW.mkdir(parents=True, exist_ok=True)
 m.cfg.BATCH_SIZE = ARGS.batch
 m.cfg.COMM_ROUNDS = ARGS.rounds
 m.cfg.AGG_WEIGHT_TYPE = ARGS.agg_weight_type
+m.cfg.PERSONALIZE_DEEP = ARGS.personalize_deep
+m.cfg.ULTRASOUND_AUG = ARGS.ultrasound_aug
 m.cfg.HOSPITAL_B_SUBSET_SIZE = ARGS.hospital_b_subset_size if ARGS.hospital_b_subset_size > 0 else None
+m.cfg.DATA_ROOT = ARGS.data_root
+m.ROOT = Path(ARGS.data_root)
+m.DATASET_DIR = {
+    'brain_tumor': m.ROOT / 'Brain Tumor MRI Dataset',
+    'busi':        m.ROOT / 'Dataset_BUSI_with_GT',
+    'covid':       m.ROOT / 'COVID-19_Radiography_Dataset',
+}
 
 # ------------------------------------------------------------
 # Data builders (seed-aware splits via m.SEED)
@@ -95,8 +109,8 @@ def build_data(seed):
         client_dfs[cid] = sub
     return all_df, classes, class_to_idx, client_dfs
 
-def loaders_for(df):
-    return m.build_loaders(df, ARGS.batch, 0, hospital_b_subset_size=ARGS.hospital_b_subset_size)
+def loaders_for(df, client_id=None):
+    return m.build_loaders(df, ARGS.batch, 0, hospital_b_subset_size=ARGS.hospital_b_subset_size, client_id=client_id)
 
 def train_size(df):
     return int((df['split'] == 'train').sum())
@@ -632,7 +646,7 @@ def main():
 
         all_df, classes, class_to_idx, client_dfs = build_data(seed)
         cids = list(range(m.cfg.NUM_CLIENTS))
-        loaders = {c: loaders_for(client_dfs[c]) for c in cids}
+        loaders = {c: loaders_for(client_dfs[c], client_id=c) for c in cids}
         cw = {c: m.class_weights(client_dfs[c], hospital_b_subset_size=ARGS.hospital_b_subset_size) for c in cids}
         ncls_local = {c: int(client_dfs[c]['local'].max()) + 1 for c in cids}
         agg = agg_weights(client_dfs, weight_type=ARGS.agg_weight_type)
