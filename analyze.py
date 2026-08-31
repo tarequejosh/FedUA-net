@@ -56,6 +56,30 @@ def main():
         mean_brier=('brier', 'mean')
     ).reset_index()
 
+    def jains_fairness_index(values):
+        """Jain's fairness index in [1/n, 1]; 1.0 = perfectly equal across clients."""
+        values = np.asarray(values, dtype=np.float64)
+        n = len(values)
+        return (values.sum() ** 2) / (n * np.sum(values ** 2))
+
+    fairness_rows = []
+    for (seed, strategy), g in df_clients_only.groupby(['seed', 'strategy']):
+        accs = g['acc'].values
+        fairness_rows.append({
+            'seed': seed, 'strategy': strategy,
+            'worst_client_acc': accs.min(),
+            'best_client_acc': accs.max(),
+            'acc_std_across_clients': accs.std(),
+            'jains_fairness_index': jains_fairness_index(accs),
+        })
+    fairness_df = pd.DataFrame(fairness_rows)
+    fairness_summary = fairness_df.groupby('strategy').agg(
+        mean_worst_client_acc=('worst_client_acc', 'mean'),
+        std_worst_client_acc=('worst_client_acc', 'std'),
+        mean_jains_index=('jains_fairness_index', 'mean'),
+    ).reset_index().sort_values('mean_worst_client_acc', ascending=False)
+    fairness_summary.to_csv(REP / 'fairness_summary.csv', index=False)
+
     print('=' * 85)
     print('                    FEDUA-NET COMPREHENSIVE BENCHMARK REPORT')
     print('=' * 85)
@@ -113,6 +137,11 @@ def main():
     for col in ['ece', 'brier']:
         disp_summary[f'{col}'] = disp_summary.apply(lambda r: f"{r[f'{col}_mean']:.4f} +/- {r[f'{col}_std']:.4f}", axis=1)
     print(disp_summary[['acc', 'f1', 'mcc', 'auc', 'ece', 'brier', 'n_seeds']].to_string())
+    
+    print('\n' + '=' * 85)
+    print('  FAIRNESS SUMMARY (worst-client accuracy + Jain\'s index, higher = fairer)')
+    print('=' * 85)
+    print(fairness_summary.to_string(index=False))
     
     # Statistical Significance Testing
     print('\n[2] Paired Statistical Significance Tests (vs Reference: FedUA-Net):')

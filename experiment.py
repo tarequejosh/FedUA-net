@@ -60,6 +60,8 @@ def parse_args():
                     help='CKA-guided: keep CBAM attention + projection layer local per client, never aggregated')
     ap.add_argument('--ultrasound_aug', action='store_true', default=False,
                     help='Apply ultrasound-specific data augmentations (Speckle noise + Elastic transform) for Hospital B')
+    ap.add_argument('--save_final_models', action='store_true',
+                    help='Save each client final trained model state_dict for post-hoc analysis (CKA, qualitative gallery)')
     ap.add_argument('--hospital_b_subset_size', type=int, default=0,
                     help="Subsample size for Hospital B training dataset (0 = use all data)")
     ap.add_argument('--smoke', action='store_true')
@@ -679,6 +681,11 @@ def main():
                       f'MCC={ev["mcc"]:.3f} | ECE={ev["ece"]:.4f} | Brier={ev["brier"]:.4f}')
             print(f'  [{name}] done in {time.time() - t0:.1f}s')
             pd.DataFrame(strat_rows).to_csv(out_csv, index=False)
+            if ARGS.save_final_models:
+                ckpt_dir = OUT / 'final_models'
+                ckpt_dir.mkdir(parents=True, exist_ok=True)
+                for c in cids:
+                    torch.save(nets[c].state_dict(), ckpt_dir / f'{name}_seed{seed}_client{c}.pt')
             run_calibration(name, nets, client_dfs, loaders, seed)
             print(f'  [{name}] calibration/conformal done')
 
