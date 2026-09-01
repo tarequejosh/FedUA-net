@@ -68,6 +68,8 @@ scratch/
 ~$*
 temp/
 *.tmp
+*.docx
+baseline_report.txt
 
 # LaTeX Build Intermediate Artifacts (keep paper.tex, paper.pdf, paper_figures/)
 *.aux
