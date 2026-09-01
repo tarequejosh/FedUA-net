@@ -22,7 +22,10 @@ if sys.stdout.encoding != 'utf-8':
 
 _ap = argparse.ArgumentParser()
 _ap.add_argument('--out', default='./outputs_experiments')
-OUT = Path(_ap.parse_args().out)
+_ap.add_argument('--baseline_dir', default=None, help='Directory containing baseline raw_*.csv files (e.g. ./results/verified/main_uniform)')
+_args = _ap.parse_args()
+OUT = Path(_args.out)
+BASELINE_DIR = Path(_args.baseline_dir) if _args.baseline_dir else None
 RAW = OUT / 'raw'
 REP = OUT / 'reports'
 REP.mkdir(parents=True, exist_ok=True)
@@ -31,6 +34,12 @@ REF = 'fedua'
 
 def load_raw():
     frames = []
+    if BASELINE_DIR:
+        b_raw = BASELINE_DIR / 'raw' if (BASELINE_DIR / 'raw').exists() else BASELINE_DIR
+        for f in sorted(b_raw.glob('raw_*_seed*.csv')):
+            if 'smoke' in f.name or f'raw_{REF}_' in f.name:
+                continue
+            frames.append(pd.read_csv(f))
     for f in sorted(RAW.glob('raw_*_seed*.csv')):
         if 'smoke' in f.name:
             continue

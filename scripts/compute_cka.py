@@ -90,11 +90,8 @@ def collect_layer_activations(net, data_loader, device, max_samples=200):
     extractor.remove()
     return {k: torch.cat(v, dim=0)[:max_samples].numpy() for k, v in layer_acts.items()}
 
-def evaluate_cka_for_dir(models_dir, probe_loader, device, seed=0, strategy='fedua'):
+def evaluate_cka_for_seed(models_dir, probe_loader, device, seed=0, strategy='fedua'):
     models_path = Path(models_dir)
-    print(f"\n[CKA] Evaluating checkpoints in: {models_path}")
-    
-    # Client class counts: A (Brain MRI: 4), B (US: 3), C (COVID X-Ray: 4)
     ncls_map = {0: 4, 1: 3, 2: 4}
     client_acts = {}
     
@@ -107,7 +104,6 @@ def evaluate_cka_for_dir(models_dir, probe_loader, device, seed=0, strategy='fed
         net.load_state_dict(torch.load(ckpt_file, map_location=device))
         acts = collect_layer_activations(net, probe_loader, device, max_samples=200)
         client_acts[c] = acts
-        print(f"  Client {c} activations extracted from {ckpt_file.name}")
 
     layers = ['features[1]', 'features[3]', 'features[5]', 'attention', 'fc']
     layer_labels = ['Early (features[1])', 'Mid (features[3])', 'Mid-Late (features[5])', 'Dual CBAM (attention)', 'Projection (fc)']
@@ -125,14 +121,13 @@ def evaluate_cka_for_dir(models_dir, probe_loader, device, seed=0, strategy='fed
             'cka_B_C': cka_bc,
             'mean_cka': mean_cka
         }
-        print(f"  Layer {l_name:24s} -> A-B: {cka_ab:.4f} | A-C: {cka_ac:.4f} | B-C: {cka_bc:.4f} | Mean: {mean_cka:.4f}")
-        
     return results
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--baseline_models', default='./outputs_checkpoints_uniform_baseline/final_models')
-    parser.add_argument('--personalized_models', default='./outputs_checkpoints_personalized/final_models')
+    parser.add_argument('--baseline_models', default='./outputs_checkpoints_uniform_baseline_3seed/final_models')
+    parser.add_argument('--personalized_models', default='./outputs_checkpoints_personalized_3seed/final_models')
+    parser.add_argument('--seeds', type=int, nargs='+', default=[0, 1, 2])
     parser.add_argument('--output_dir', default='./results')
     args = parser.parse_args()
     
@@ -155,52 +150,84 @@ def main():
     probe_loader = torch.utils.data.DataLoader(probe_ds, batch_size=32, shuffle=False)
     print(f"[OK] Probe dataset: {len(probe_ds)} validation images.")
     
-    # Compute CKA for baseline & personalized
-    baseline_res = evaluate_cka_for_dir(args.baseline_models, probe_loader, device)
-    personalized_res = evaluate_cka_for_dir(args.personalized_models, probe_loader, device)
+    layer_labels = ['Early (features[1])', 'Mid (features[3])', 'Mid-Late (features[5])', 'Dual CBAM (attention)', 'Projection (fc)']
     
-    # Build comparison dataframe
-    rows = []
-    for k in baseline_res:
-        b_mean = baseline_res[k]['mean_cka']
-        p_mean = personalized_res[k]['mean_cka']
-        delta = p_mean - b_mean
-        rows.append({
-            'layer': k,
-            'cka_uniform_baseline': b_mean,
-            'cka_personalize_deep': p_mean,
-            'delta': delta,
-            'baseline_A_B': baseline_res[k]['cka_A_B'],
-            'baseline_A_C': baseline_res[k]['cka_A_C'],
-            'baseline_B_C': baseline_res[k]['cka_B_C'],
-            'pers_A_B': personalized_res[k]['cka_A_B'],
-            'pers_A_C': personalized_res[k]['cka_A_C'],
-            'pers_B_C': personalized_res[k]['cka_B_C'],
+    # Collect per-seed evaluations
+    baseline_seed_res = {s: evaluate_cka_for_seed(args.baseline_models, probe_loader, device, seed=s) for s in args.seeds}
+    pers_seed_res = {s: evaluate_cka_for_seed(args.personalized_models, probe_loader, device, seed=s) for s in args.seeds}
+    
+    # Compute cross-seed statistics
+    rows_3seed = []
+    for l_name in layer_labels:
+        b_means = [baseline_seed_res[s][l_name]['mean_cka'] for s in args.seeds]
+        p_means = [pers_seed_res[s][l_name]['mean_cka'] for s in args.seeds]
+        deltas = [p - b for p, b in zip(p_means, b_means)]
+        
+        b_ab = [baseline_seed_res[s][l_name]['cka_A_B'] for s in args.seeds]
+        b_ac = [baseline_seed_res[s][l_name]['cka_A_C'] for s in args.seeds]
+        b_bc = [baseline_seed_res[s][l_name]['cka_B_C'] for s in args.seeds]
+        
+        p_ab = [pers_seed_res[s][l_name]['cka_A_B'] for s in args.seeds]
+        p_ac = [pers_seed_res[s][l_name]['cka_A_C'] for s in args.seeds]
+        p_bc = [pers_seed_res[s][l_name]['cka_B_C'] for s in args.seeds]
+        
+        rows_3seed.append({
+            'layer': l_name,
+            'baseline_mean': np.mean(b_means),
+            'baseline_std': np.std(b_means, ddof=1) if len(args.seeds) > 1 else 0.0,
+            'pers_mean': np.mean(p_means),
+            'pers_std': np.std(p_means, ddof=1) if len(args.seeds) > 1 else 0.0,
+            'delta_mean': np.mean(deltas),
+            'delta_std': np.std(deltas, ddof=1) if len(args.seeds) > 1 else 0.0,
+            'baseline_A_B_mean': np.mean(b_ab),
+            'baseline_A_C_mean': np.mean(b_ac),
+            'baseline_B_C_mean': np.mean(b_bc),
+            'pers_A_B_mean': np.mean(p_ab),
+            'pers_A_C_mean': np.mean(p_ac),
+            'pers_B_C_mean': np.mean(p_bc),
         })
         
-    df_res = pd.DataFrame(rows)
-    csv_path = out_dir / 'cka_before_after.csv'
-    df_res.to_csv(csv_path, index=False)
-    print(f"\n[OK] CKA comparison saved to: {csv_path}")
-    print("\n" + "=" * 75)
-    print("                     CKA REPRESENTATION SIMILARITY COMPARISON")
-    print("=" * 75)
-    print(df_res[['layer', 'cka_uniform_baseline', 'cka_personalize_deep', 'delta']].to_string(index=False))
+    df_3seed = pd.DataFrame(rows_3seed)
+    csv_3seed_path = out_dir / 'cka_before_after_3seed.csv'
+    df_3seed.to_csv(csv_3seed_path, index=False)
+    print(f"\n[OK] 3-seed CKA comparison saved to: {csv_3seed_path}")
+    print("\n" + "=" * 85)
+    print("                     3-SEED CKA REPRESENTATION SIMILARITY (MEAN +/- STD)")
+    print("=" * 85)
+    print(df_3seed[['layer', 'baseline_mean', 'baseline_std', 'pers_mean', 'pers_std', 'delta_mean', 'delta_std']].to_string(index=False))
     
-    # Render Two-Panel Figure (Fig 7b)
+    # Also save single-seed for backwards compatibility if seed 0 in args.seeds
+    if 0 in args.seeds:
+        rows_s0 = []
+        for l_name in layer_labels:
+            b_val = baseline_seed_res[0][l_name]['mean_cka']
+            p_val = pers_seed_res[0][l_name]['mean_cka']
+            rows_s0.append({
+                'layer': l_name,
+                'cka_uniform_baseline': b_val,
+                'cka_personalize_deep': p_val,
+                'delta': p_val - b_val,
+                'baseline_A_B': baseline_seed_res[0][l_name]['cka_A_B'],
+                'baseline_A_C': baseline_seed_res[0][l_name]['cka_A_C'],
+                'baseline_B_C': baseline_seed_res[0][l_name]['cka_B_C'],
+                'pers_A_B': pers_seed_res[0][l_name]['cka_A_B'],
+                'pers_A_C': pers_seed_res[0][l_name]['cka_A_C'],
+                'pers_B_C': pers_seed_res[0][l_name]['cka_B_C'],
+            })
+        pd.DataFrame(rows_s0).to_csv(out_dir / 'cka_before_after.csv', index=False)
+
+    # Render Two-Panel Figure (Fig 7b) using 3-seed means
     setup_academic_style()
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.2), sharey=True)
     
-    layers = [r['layer'] for r in rows]
+    layers = [r['layer'] for r in rows_3seed]
     pairs = ['Hospital A - B', 'Hospital A - C', 'Hospital B - C']
     
-    # Matrix for baseline
     b_mat = np.array([
-        [r['baseline_A_B'], r['baseline_A_C'], r['baseline_B_C']] for r in rows
+        [r['baseline_A_B_mean'], r['baseline_A_C_mean'], r['baseline_B_C_mean']] for r in rows_3seed
     ])
-    # Matrix for personalized
     p_mat = np.array([
-        [r['pers_A_B'], r['pers_A_C'], r['pers_B_C']] for r in rows
+        [r['pers_A_B_mean'], r['pers_A_C_mean'], r['pers_B_C_mean']] for r in rows_3seed
     ])
     
     vmin = min(b_mat.min(), p_mat.min(), 0.3)
@@ -208,14 +235,13 @@ def main():
     cmap = 'magma'
     
     im0 = axes[0].imshow(b_mat, aspect='auto', cmap=cmap, vmin=vmin, vmax=vmax)
-    axes[0].set_title('(a) Uniform Aggregation (Baseline)', fontweight='bold', pad=10)
+    axes[0].set_title('(a) Uniform Aggregation (Baseline, 3-Seed Mean)', fontweight='bold', pad=10)
     axes[0].set_xticks(range(3))
     axes[0].set_xticklabels(pairs, rotation=15, ha='right')
     axes[0].set_yticks(range(len(layers)))
     axes[0].set_yticklabels(layers)
     axes[0].grid(False)
     
-    # Annotate values
     for i in range(len(layers)):
         for j in range(3):
             val = b_mat[i, j]
@@ -223,7 +249,7 @@ def main():
                          color='white' if val < 0.75 else 'black', fontweight='bold', fontsize=9.5)
             
     im1 = axes[1].imshow(p_mat, aspect='auto', cmap=cmap, vmin=vmin, vmax=vmax)
-    axes[1].set_title('(b) CKA-Guided Depth-Adaptive (Ours)', fontweight='bold', pad=10)
+    axes[1].set_title('(b) CKA-Guided Personalization (Ours, 3-Seed Mean)', fontweight='bold', pad=10)
     axes[1].set_xticks(range(3))
     axes[1].set_xticklabels(pairs, rotation=15, ha='right')
     axes[1].grid(False)
