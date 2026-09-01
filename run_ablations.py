@@ -18,8 +18,8 @@ import numpy as np
 import pandas as pd
 import torch
 
-sys.path.insert(0, r'D:/Research/FedUA-Net')
-os.environ.setdefault('TORCH_HOME', r'D:/Research/FedUA-Net/.torch_cache')
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+os.environ.setdefault('TORCH_HOME', str(Path(__file__).resolve().parent / '.torch_cache'))
 
 import experiment as exp
 import fedua_net as m
@@ -32,7 +32,7 @@ def parse_args():
     ap.add_argument('--seeds', type=int, default=[0, 1, 2], nargs='*')
     ap.add_argument('--rounds', type=int, default=12)
     ap.add_argument('--batch', type=int, default=32)
-    ap.add_argument('--out', default=r'D:/Research/FedUA-Net/outputs_experiments')
+    ap.add_argument('--out', default='./outputs_experiments')
     ap.add_argument('--resume', action='store_true')
     return ap.parse_args()
 

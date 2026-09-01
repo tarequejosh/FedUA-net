@@ -15,7 +15,9 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-sys.path.insert(0, r'D:/Research/FedUA-Net')
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fedua_net as m
 
 SEED = 42

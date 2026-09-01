@@ -5,8 +5,11 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-log = r'D:/Research/FedUA-Net/outputs_final/train_final.log'
-out = r'D:/Research/FedUA-Net/outputs_final'
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent
+log = os.environ.get('TRAIN_LOG', str(BASE / 'outputs_final' / 'train_final.log'))
+out = os.environ.get('OUTPUT_DIR', str(BASE / 'outputs_final'))
 rows = []
 pat = re.compile(r"R\s+(\d+)\s+LRb=[\d.e-]+\s+C0=([\d.]+)\s+C1=([\d.]+)\s+C2=([\d.]+)\s+mean=([\d.]+)")
 for line in open(log, encoding='utf-8', errors='ignore'):

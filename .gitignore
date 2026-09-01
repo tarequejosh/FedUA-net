@@ -1,46 +1,80 @@
-# Datasets
-Dataset/
-data/
+# ==============================================================================
+# FedUA-Net: Open-Science Publication .gitignore
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments & Packages
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyTorch Caches & Model Weights
+.torch_cache/
 *.pt
 *.pth
+*.bin
+*.onnx
 outputs_final/models/
 outputs_experiments/models/
 results/**/models/
 
-# Temporary & backup files
-outputs_experiments/raw_backup_v1/
-outputs_experiments/smoke_test/
-fig1_architecture_*.jpg
+# Experiments & Logs
+outputs_*/
+wandb/
+runs/
+*.log
 
-# Paper files & drafts (kept local, excluded from git)
-paper.tex
-paper.pdf
-paper_draft/
+# Large Datasets
+Dataset/
+data/
+datasets/
+*.zip
+*.tar
+*.tar.gz
+*.7z
 
-# LaTeX build intermediate artifacts
-paper.aux
-paper.log
-paper.out
-paper.bbl
-paper.blg
-paper.synctex.gz
-paper.fls
-paper.fdb_latexmk
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
 
-# Python caches
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-.pytest_cache/
-
-# IDE and Environment
+# IDE and Editor settings
 .vscode/
-.torch_cache/
 .idea/
-venv/
-env/
-.env
+*.swp
+*.swo
+*~
 
-# OS generated files
+# Operating System Files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# Temporary Scratch Files & Word Locks
+scratch/
+~$*
+temp/
+*.tmp
+
+# LaTeX Build Intermediate Artifacts (keep paper.tex, paper.pdf, paper_figures/)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.out

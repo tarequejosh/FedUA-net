@@ -1,0 +1,43 @@
+# FedUA-Net Configuration File
+# Default relative paths and hyperparameters for reproducibility
+
+data:
+  data_root: "./Dataset"
+  img_size: 224
+  val_frac: 0.15
+  batch_size: 32
+  num_workers: 0
+
+federated:
+  num_clients: 3
+  comm_rounds: 12
+  local_epochs:
+    client_0: 4
+    client_1: 10
+    client_2: 2
+  agg_weight_type: "uniform"   # 'uniform' (1/K) or 'sample' (N_k/N_total)
+  hospital_b_subset_size: null  # null or int for data scarcity ablation (e.g., 100, 200)
+
+model:
+  backbone: "efficientnet_v2_s"
+  emb_dim: 512
+  dropout: 0.30
+  cbam_ratio: 8
+  cbam_kernel: 7
+  attention: "cbam"            # 'cbam', 'channel', 'spatial', 'none'
+  base_lr: 0.0003
+  backbone_lr: 0.0001
+  min_lr: 0.000005
+  weight_decay: 0.0001
+  label_smoothing: 0.1
+  amp: false
+
+conformal:
+  temp_tune: true
+  mc_iters: 30
+  alpha: 0.10                  # Target miscoverage rate (90% nominal coverage)
+
+paths:
+  output_dir: "./outputs_final"
+  experiment_dir: "./outputs_experiments"
+  torch_cache: "./.torch_cache"

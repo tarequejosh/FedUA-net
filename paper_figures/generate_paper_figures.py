@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
-ROOT = Path(r'D:/Research/FedUA-Net')
+ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / 'outputs_experiments' / 'raw'
 REP = ROOT / 'outputs_experiments' / 'reports'
 OUT = ROOT / 'paper_figures'
