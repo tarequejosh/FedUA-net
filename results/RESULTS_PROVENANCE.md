@@ -69,9 +69,9 @@ Every experimental metric and table entry in this repository is classified under
   - Scarcity ($N=200$): `results/verified/scarcity_200/raw/`
   - Extreme ($N=100$): `results/verified/scarcity_100/raw/`
 - **Summary of Verified Numbers**:
-  - **$N=546$ (100% data)**: Local-Only ($84.62\%$), FedBN ($85.47\%$), FedUA-Net ($\mathbf{88.60 \pm 3.56\%}$).
-  - **$N=200$ (Scarcity)**: Local-Only ($79.77\%$), FedBN ($73.22 \pm 1.31\%$), FedUA-Net ($\mathbf{77.21 \pm 4.71\%}$, $\mathbf{+3.99\%}$ over FedBN).
-  - **$N=100$ (Extreme)**: Local-Only ($81.20\%$), FedBN ($66.67 \pm 1.48\%$), FedUA-Net ($\mathbf{70.09 \pm 4.52\%}$, $\mathbf{+3.42\%}$ over FedBN).
+  - **$N=546$ (100% data)**: Local-Only ($90.31 \pm 0.99\%$), FedBN ($85.47 \pm 3.42\%$), FedUA-Net ($\mathbf{88.60 \pm 3.56\%}$).
+  - **$N=200$ (Scarcity)**: Local-Only ($84.33 \pm 3.00\%$), FedBN ($73.22 \pm 1.31\%$), FedUA-Net ($\mathbf{77.21 \pm 4.71\%}$, $\mathbf{+3.99\%}$ over FedBN).
+  - **$N=100$ (Extreme)**: Local-Only ($81.20 \pm 5.20\%$), FedBN ($66.67 \pm 1.48\%$), FedUA-Net ($\mathbf{70.09 \pm 4.52\%}$, $\mathbf{+3.42\%}$ over FedBN).
 
 ---
 
