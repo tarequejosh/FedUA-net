@@ -163,7 +163,14 @@ This writes:
 - `outputs_experiments/reports/conformal_results.csv`
 - `outputs_experiments/reports/table1_publication.tex`
 
-### C. Benchmark Training Protocol (Documented Reference)
+### C. Hardware Environment & Benchmark Specs
+- **GPU:** NVIDIA GeForce RTX 5060 (8 GB GDDR7 VRAM, 145W TGP, Ada Lovelace / Blackwell architecture with Tensor Cores).
+- **CPU:** Intel Core Ultra 7 265F (20 physical cores, 20 logical threads, up to 5.40 GHz).
+- **RAM:** 64 GB DDR5 system memory.
+- **OS & Software:** Windows 11 Enterprise (Build 26200), PyTorch 2.11.0, CUDA 12.8, cuDNN 9.1.9, Python 3.12.
+- **Inference Latency:** $\approx 8.4\text{ ms}$ per image on GPU ($\approx 42\text{ ms}$ on CPU); post-hoc conformal APS $<0.15\text{ ms}$ per sample.
+
+### D. Benchmark Training Protocol (Documented Reference)
 For archival and replication provenance, the canonical multi-seed baseline ladder was executed with:
 ```bash
 python experiment.py \
