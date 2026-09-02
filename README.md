@@ -163,7 +163,6 @@ FedUA-Net/
 ├── fedua_net.py                  # Core architecture, CBAM, and FL engine
 ├── environment.yml               # Conda environment definition
 ├── requirements.txt              # Pinned pip requirements
-├── paper.tex                     # IEEE TMI / MedIA LaTeX manuscript
 └── README.md                     # This file
 ```
 

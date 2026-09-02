@@ -71,7 +71,14 @@ temp/
 *.docx
 baseline_report.txt
 
-# LaTeX Build Intermediate Artifacts (keep paper.tex, paper.pdf, paper_figures/)
+# Manuscripts, Drafts, and Writing Notes (kept private locally)
+paper.tex
+paper.pdf
+paper_draft/
+literature_review/
+PROGRESS.md
+
+# LaTeX Build Intermediate Artifacts
 *.aux
 *.bbl
 *.blg
@@ -80,3 +87,4 @@ baseline_report.txt
 *.synctex.gz
 *.toc
 *.out
+
