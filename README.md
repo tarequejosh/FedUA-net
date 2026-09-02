@@ -58,6 +58,16 @@ The framework is evaluated across three heterogeneous clinical cohorts represent
 | **FedBABU** | $91.99 \pm 0.35$ | $91.50 \pm 0.34$ | $0.873 \pm 0.006$ | 0.0640 | 0.1913 | $2.14 \pm 0.17$ | $84.62 \pm 1.48$ | 0.9967 |
 | **FedProx** | $91.97 \pm 1.03$ | $91.46 \pm 1.21$ | $0.870 \pm 0.019$ | 0.0680 | 0.0888 | $2.26 \pm 0.18$ | $84.33 \pm 3.56$ | 0.9963 |
 
+### Hospital B (Breast Ultrasound) 5-Condition Ablation
+
+| Condition | Seeds ($n$) | Hospital B Accuracy (%) | Macro F1 (%) | ECE | Brier Score | Per-Seed Accuracies (%) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **1. FedUA Uniform (Baseline)** | 3 | $88.60 \pm 3.56$ | $87.45 \pm 4.14$ | 0.0359 | 0.1836 | `[84.62, 89.74, 91.45]` |
+| **2. + Personalize-Only (`--personalize_deep`)** | 5 | $\mathbf{90.26 \pm 3.00}$ | $\mathbf{89.39 \pm 3.38}$ | 0.0556 | 0.1514 | `[85.47, 90.60, 89.74, 93.16, 92.31]` |
+| **3. + Augment-Only (Heavy: `--ultrasound_aug`)** | 5 | $88.38 \pm 2.68$ | $87.14 \pm 2.65$ | 0.0660 | 0.1839 | `[85.47, 89.74, 85.47, 90.60, 90.60]` |
+| **4. + Augment-Only (Mild: `--ultrasound_aug_mild`)** | 5 | $88.72 \pm 4.25$ | $87.57 \pm 5.23$ | 0.0724 | 0.1794 | `[82.05, 88.89, 88.03, 93.16, 91.45]` |
+| **5. + Combined (Personalize + Heavy Aug)** | 5 | $88.89 \pm 4.36$ | $87.97 \pm 5.24$ | 0.0634 | 0.1799 | `[83.76, 88.89, 85.47, 92.31, 94.02]` |
+
 ---
 
 ## 4. Mechanistic Interpretability & Clinical Galleries

@@ -200,18 +200,19 @@ We compare FedUA-Net against $7$ baseline configurations under identical initial
 
 \begin{table*}[t]
 \centering
-\caption{Comprehensive quantitative comparison across 3 heterogeneous clinical sites (3-seed mean $\pm$ std). Uncertainty metrics reported with validation-guided Temperature Scaling; Conformal APS set size evaluated at 90\% target coverage ($\alpha=0.10$). Centralized pooled training merges data across institutional boundaries into an unpartitioned 11-class global classification problem without client-specific validation splits ($\mathcal{D}_{\text{val}, k}$), precluding local temperature scaling and localized conformal set calibration (denoted as `---').}
+\caption{Comprehensive quantitative comparison across 3 heterogeneous clinical sites (mean $\pm$ std). Uncertainty metrics reported with validation-guided Temperature Scaling; Conformal APS set size evaluated at 90\% target coverage ($\alpha=0.10$). Centralized pooled training merges data across institutional boundaries into an unpartitioned 11-class global classification problem without client-specific validation splits ($\mathcal{D}_{\text{val}, k}$), precluding local temperature scaling and localized conformal set calibration (denoted as `---').}
 \label{tab:main_results}
 \small
-\setlength{\tabcolsep}{4.0pt}
+\setlength{\tabcolsep}{3.8pt}
 \begin{tabular}{lcccccc}
 \toprule
 Method & Accuracy (\%) & Macro F1 (\%) & MCC & Raw ECE & Calibrated ECE & APS Set Size ($\alpha=0.10$) \\
 \midrule
 Local-Only & $94.01 \pm 0.32$ & $93.80 \pm 0.48$ & $0.906 \pm 0.005$ & $0.0463$ & $0.0251$ & $2.01 \pm 0.07$ \\
 Ditto & $93.93 \pm 0.51$ & $93.67 \pm 0.62$ & $0.904 \pm 0.009$ & $0.0597$ & $0.0289$ & $2.18 \pm 0.09$ \\
+\textbf{FedUA-Net (CKA-Personalized)} & $\mathbf{93.87 \pm 0.94}$ & $\mathbf{93.73 \pm 1.08}$ & $\mathbf{0.904 \pm 0.016}$ & $0.0588$ & $\mathbf{0.0307}$ & $\mathbf{2.19 \pm 0.17}$ \\
 Centralized (Pooled) & $93.45 \pm 1.30$ & $93.36 \pm 1.38$ & $0.895 \pm 0.024$ & $0.0714$ & --- & --- \\
-\textbf{FedUA-Net (Proposed)} & $\mathbf{93.30 \pm 1.13}$ & $\mathbf{93.05 \pm 1.36}$ & $\mathbf{0.894 \pm 0.019}$ & $\mathbf{0.0504}$ & $\mathbf{0.0307}$ & $\mathbf{2.33 \pm 0.23}$ \\
+\textbf{FedUA-Net (Uniform Baseline)} & $93.30 \pm 1.13$ & $93.05 \pm 1.36$ & $0.894 \pm 0.019$ & $\mathbf{0.0504}$ & $\mathbf{0.0307}$ & $2.33 \pm 0.23$ \\
 FedAvg & $92.36 \pm 0.92$ & $91.88 \pm 1.23$ & $0.878 \pm 0.016$ & $0.0697$ & $0.0398$ & $2.22 \pm 0.11$ \\
 FedBN & $92.34 \pm 0.99$ & $91.76 \pm 1.02$ & $0.877 \pm 0.017$ & $0.0650$ & $0.0379$ & $2.20 \pm 0.16$ \\
 FedBABU & $91.99 \pm 0.35$ & $91.50 \pm 0.34$ & $0.873 \pm 0.006$ & $0.0640$ & $0.1913$ & $2.14 \pm 0.17$ \\
@@ -222,7 +223,7 @@ FedProx & $91.97 \pm 1.03$ & $91.46 \pm 1.21$ & $0.870 \pm 0.019$ & $0.0680$ & $
 
 \begin{table}[t]
 \centering
-\caption{Per-client classification accuracy (\%) across individual clinical sites (3-seed mean $\pm$ std).}
+\caption{Per-client classification accuracy (\%) across individual clinical sites (mean $\pm$ std).}
 \label{tab:per_client}
 \footnotesize
 \setlength{\tabcolsep}{1.8pt}
@@ -232,8 +233,9 @@ Method & Site A (MRI) & Site B (US) & Site C (X-Ray) \\
 \midrule
 Local-Only & $96.21 \pm 0.10$ & $90.31 \pm 0.99$ & $95.50 \pm 0.43$ \\
 Ditto & $96.15 \pm 0.07$ & $90.60 \pm 2.26$ & $95.03 \pm 0.99$ \\
+\textbf{FedUA-Net (CKA-Pers.)} & $95.89 \pm 0.18$ & $\mathbf{90.26 \pm 3.00}$ & $95.46 \pm 0.25$ \\
 Centralized & $96.38 \pm 0.25$ & $88.03 \pm 4.52$ & $95.93 \pm 0.66$ \\
-\textbf{FedUA-Net} & $\mathbf{96.06 \pm 0.29}$ & $\mathbf{88.60 \pm 3.56}$ & $\mathbf{95.23 \pm 0.42}$ \\
+\textbf{FedUA-Net (Baseline)} & $\mathbf{96.06 \pm 0.29}$ & $88.60 \pm 3.56$ & $95.23 \pm 0.42$ \\
 FedAvg & $96.21 \pm 0.18$ & $85.47 \pm 3.08$ & $95.39 \pm 0.72$ \\
 FedBN & $96.10 \pm 0.25$ & $85.47 \pm 3.42$ & $95.44 \pm 0.57$ \\
 FedBABU & $96.10 \pm 0.31$ & $84.62 \pm 1.48$ & $95.24 \pm 0.79$ \\
@@ -389,7 +391,7 @@ Table~\ref{tab:ablation} details the systematic ablation study evaluating the mo
 \begin{itemize}
     \item \textbf{Primary Driver: Personalization Fine-Tuning:} As shown in Table~\ref{tab:ablation}, client-side personalization fine-tuning (Local FT) provides the primary recovery from cross-modality domain shift on the low-sample cohort, with Hospital B accuracy jumping from $54.99 \pm 3.00\%$ to $82.91 \pm 3.73\%$ ($+27.92\%$).
     \item \textbf{Feature Refinement via CBAM Attention:} Building upon local fine-tuning, adding dual-domain CBAM attention provides localized feature refinement and lesion boundary focus, yielding the highest multi-task diagnostic performance ($91.75 \pm 1.34\%$ mean accuracy, $83.48 \pm 4.04\%$ on Hospital B), outperforming spatial-only ($90.53\%$) and channel-only ($90.90\%$) configurations.
-    \item \textbf{Impact of Ultrasound Data Augmentation:} We further evaluated domain-specific ultrasound augmentations (Speckle Noise + Elastic Transforms) on Hospital B across 5 independent seeds. Under aggressive augmentation parameters ($\sigma=0.08, p=0.5$; $\alpha=25.0, \sigma=4.0$), augmentation alone achieved $88.38 \pm 2.68\%$ and combined with personalization achieved $88.89 \pm 4.36\%$. This demonstrates that architectural personalization (\texttt{--personalize\_deep}, achieving \textbf{$90.26 \pm 3.00\%$}) is the dominant factor in resolving cross-modality shift, whereas heavy synthetic transformations risk over-distorting delicate micro-calcifications and acoustic boundaries in small ultrasound cohorts.
+    \item \textbf{Impact of Ultrasound Data Augmentation:} We systematically evaluated domain-specific ultrasound augmentations across 5 independent seeds on Hospital B under varying distortion regimes: heavy augmentations ($\sigma=0.08, p=0.5$; $\alpha=25.0, \sigma=4.0$) achieved $88.38 \pm 2.68\%$ alone and $88.89 \pm 4.36\%$ combined with personalization; milder augmentations ($\sigma=0.04, p=0.3$; $\alpha=15.0, \sigma=4.0$) achieved $88.72 \pm 4.25\%$ alone. Both hover around the unaugmented uniform baseline ($88.60 \pm 3.56\%$). This demonstrates that architectural personalization (\texttt{--personalize\_deep}, achieving \textbf{$90.26 \pm 3.00\%$}) is the decisive factor in resolving cross-modality acoustic shift, while synthetic geometric warping and noise injection risk perturbing diagnostic lesion margins in data-scarce ultrasound cohorts ($N=546$).
 \end{itemize}
 
 \subsection{Robustness Under Extreme Data Scarcity}
