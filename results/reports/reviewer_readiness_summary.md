@@ -74,16 +74,17 @@ $$\mathcal{J}(x_1, x_2, \dots, x_K) = \frac{\left(\sum_{k=1}^K x_k\right)^2}{K \
 
 To explain *why* depth-adaptive personalization succeeds, layer activations were captured across $N=210$ shared validation images across all 3 client models using `scripts/compute_cka.py`.
 
-### Linear CKA Similarity Index Across Layer Hierarchy:
-| Layer Depth / Block | Uniform Aggregation (Baseline) | CKA-Guided Depth-Adaptive (Ours) | $\Delta$ Alignment | Interpretation |
-|---|---|---|---|---|
-| **Early (`features[1]`)** | $0.8547$ | $0.8350$ | $-0.0197$ | High shared low-level visual features preserved |
-| **Mid (`features[3]`)** | $0.6778$ | $0.7225$ | $+0.0447$ | Shared structural representation stabilization |
-| **Mid-Late (`features[5]`)** | $0.3912$ | $0.8664$ | $+0.4752$ | Significant prevention of inter-modality conflict |
-| **Dual CBAM (`attention`)** | $0.1946$ | $0.5459$ | $+0.3514$ | Coherent modality-specific attention recalibration |
-| **Projection (`fc`)** | $0.1346$ | $0.1464$ | $+0.0118$ | Decoupled client-specific feature projection |
+### Linear CKA Similarity Index Across Layer Hierarchy (3-Seed Mean ± Std):
+| Layer Depth / Block | Uniform Aggregation (Baseline) | CKA-Guided Depth-Adaptive (Ours) | $\Delta$ Alignment ($\Delta \pm \text{std}$) | Paired $t$-test ($n=3$) | Verdict & Scientific Interpretation |
+|---|---|---|---|---|---|
+| **Early (`features[1]`)** | $0.8182 \pm 0.0273$ | $0.8340 \pm 0.0178$ | $+0.0158 \pm 0.0255$ | $t=1.071, p=0.3963$ | Retains high universal low-level visual textures across seeds (not distinguishable from noise at $n=3$) |
+| **Mid (`features[3]`)** | $0.7144 \pm 0.0470$ | $0.7136 \pm 0.0425$ | $-0.0007 \pm 0.0785$ | $t=-0.016, p=0.9884$ | Stable shared mid-level structural representations (not distinguishable from noise at $n=3$) |
+| **Mid-Late (`features[5]`)** | $0.8524 \pm 0.0472$ | $0.7992 \pm 0.0937$ | $-0.0532 \pm 0.1401$ | $t=-0.658, p=0.5781$ | Shared intermediate features preserved without significant drift (not distinguishable from noise at $n=3$) |
+| **Dual CBAM (`attention`)** | $0.5536 \pm 0.0409$ | $0.5242 \pm 0.2307$ | $-0.0294 \pm 0.2533$ | $t=-0.201, p=0.8591$ | A small, seed-variable reduction not clearly distinguishable from noise at $n=3$ |
+| **Projection (`fc`)** | $0.3675 \pm 0.0351$ | $0.1259 \pm 0.0306$ | $\mathbf{-0.2416 \pm 0.0434}$ | $\mathbf{t=-9.634, p=0.0106}$ | **Statistically significant specialization / decoupling of client-specific projection heads** |
 
 - **Figure Artifact:** [`results/figures/fig7b_cka_before_after.png`](file:///d:/Research/FedUA-Net/results/figures/fig7b_cka_before_after.png)
+- **Significance Table:** [`results/cka_significance_3seed.csv`](file:///d:/Research/FedUA-Net/results/cka_significance_3seed.csv)
 
 ---
 
@@ -100,16 +101,37 @@ In ultrasound imaging (Hospital B), acoustic shadowing, speckle artifacts, and i
 
 ## 6. Statistical Significance & Benchmark Rigor
 
-Paired two-tailed $t$-tests and Wilcoxon signed-rank tests with Holm-Bonferroni multi-comparison correction were evaluated across all methods:
+Paired two-tailed $t$-tests, 95% Bootstrap Confidence Intervals (10,000 resamples), and Wilcoxon signed-rank tests with Holm-Bonferroni multi-comparison correction were evaluated across all baseline comparisons.
 
-| Comparison (FedUA-Net vs Baseline) | $\Delta$ Acc (%) | 95% Bootstrap CI | Raw $p$-value ($t$-test) | Holm-Adjusted $p$-value |
-|---|---|---|---|---|
-| vs. **FedProx** | $+1.33\%$ | $[+1.21\%, +1.40\%]$ | $p = 0.0019$ | **$p = 0.0134$ (Statistically Significant)** |
-| vs. **FedBN** | $+0.96\%$ | $[+0.68\%, +1.38\%]$ | $p = 0.0467$ | $p = 0.2800$ |
-| vs. **FedBABU** | $+1.31\%$ | $[+0.42\%, +2.04\%]$ | $p = 0.1091$ | $p = 0.5456$ |
-| vs. **FedAvg** | $+0.94\%$ | $[+0.31\%, +1.78\%]$ | $p = 0.1639$ | $p = 0.6557$ |
-| vs. **Centralized** | $-0.15\%$ | $[-0.75\%, +0.28\%]$ | $p = 0.6847$ | $p = 1.0000$ (Matches Pooled Data) |
-| vs. **Ditto** | $-0.63\%$ | $[-1.73\%, +0.20\%]$ | $p = 0.3888$ | $p = 1.0000$ (Equally Competitive) |
+### A. Personalized FedUA-Net (`--personalize_deep`, 5 Seeds vs 3-Seed Baselines)
+*From [`results/reports/statistical_significance_personalized.csv`](file:///d:/Research/FedUA-Net/results/reports/statistical_significance_personalized.csv):*
+
+| Baseline Method | $\Delta$ Acc (%) | 95% Bootstrap CI | Paired $t$-stat | Raw $p$ ($t$-test) | Holm-Adjusted $p$ | Wilcoxon $p$-val* |
+|---|---|---|---|---|---|---|
+| vs. **FedProx** | $+1.33\%$ | $[+1.21\%, +1.40\%]$ | $t = 22.75$ | $p = 0.0019$ | **$p = 0.0135$ (Significant)** | $p = 0.2500$ |
+| vs. **FedBABU** | $+1.31\%$ | $[+0.42\%, +2.04\%]$ | $t = 2.76$ | $p = 0.1097$ | $p = 0.5487$ | $p = 0.2500$ |
+| vs. **FedBN** | $+0.96\%$ | $[+0.68\%, +1.38\%]$ | $t = 4.47$ | $p = 0.0465$ | $p = 0.2792$ | $p = 0.2500$ |
+| vs. **FedAvg** | $+0.94\%$ | $[+0.31\%, +1.78\%]$ | $t = 2.19$ | $p = 0.1598$ | $p = 0.6394$ | $p = 0.2500$ |
+| vs. **Centralized** | $-0.15\%$ | $[-0.75\%, +0.28\%]$ | $t = -0.47$ | $p = 0.6847$ | $p = 1.0000$ (Matches Pooled) | $p = 1.0000$ |
+| vs. **Ditto** | $-0.63\%$ | $[-1.73\%, +0.20\%]$ | $t = -1.09$ | $p = 0.3888$ | $p = 1.0000$ | $p = 0.5000$ |
+| vs. **Local-Only** | $-0.71\%$ | $[-1.36\%, +0.17\%]$ | $t = -1.60$ | $p = 0.2504$ | $p = 1.0000$ | $p = 0.5000$ |
+
+### B. Combined FedUA-Net (`--personalize_deep --ultrasound_aug`, 5 Seeds vs 3-Seed Baselines)
+*From [`results/reports/statistical_significance_combined.csv`](file:///d:/Research/FedUA-Net/results/reports/statistical_significance_combined.csv):*
+
+| Baseline Method | $\Delta$ Acc (%) | 95% Bootstrap CI | Paired $t$-stat | Raw $p$ ($t$-test) | Holm-Adjusted $p$ | Wilcoxon $p$-val* |
+|---|---|---|---|---|---|---|
+| vs. **FedProx** | $+0.44\%$ | $[-0.71\%, +1.15\%]$ | $t = 0.76$ | $p = 0.5283$ | $p = 1.0000$ | $p = 0.5000$ |
+| vs. **FedBABU** | $+0.42\%$ | $[-0.07\%, +0.97\%]$ | $t = 1.38$ | $p = 0.3015$ | $p = 1.0000$ | $p = 0.5000$ |
+| vs. **FedBN** | $+0.07\%$ | $[-1.29\%, +0.88\%]$ | $t = 0.10$ | $p = 0.9305$ | $p = 1.0000$ | $p = 1.0000$ |
+| vs. **FedAvg** | $+0.05\%$ | $[-1.37\%, +1.28\%]$ | $t = 0.06$ | $p = 0.9542$ | $p = 1.0000$ | $p = 1.0000$ |
+| vs. **Centralized** | $-1.04\%$ | $[-1.83\%, -0.03\%]$ | $t = -1.95$ | $p = 0.1900$ | $p = 0.9498$ | $p = 0.2500$ |
+| vs. **Ditto** | $-1.52\%$ | $[-2.46\%, -0.31\%]$ | $t = -2.39$ | $p = 0.1396$ | $p = 0.8377$ | $p = 0.2500$ |
+| vs. **Local-Only** | $-1.60\%$ | $[-2.31\%, -0.49\%]$ | $t = -2.86$ | $p = 0.1038$ | $p = 0.7264$ | $p = 0.2500$ |
+
+> [!NOTE]
+> **\*Methodological Note on Wilcoxon Signed-Rank Test Sample Size ($n < 5$):**  
+> For a two-sided paired Wilcoxon signed-rank test on matched seeds, the exact minimum achievable $p$-value under full rank agreement is strictly bounded by $1 / 2^{n-1}$. For $n=3$, the minimum possible $p$-value is $1/2^2 = 0.25$; for $n=5$, it is $1/2^4 = 0.0625$. Consequently, at $n < 6$, the paired Wilcoxon test cannot mathematically achieve significance at $\alpha = 0.05$ regardless of effect magnitude. Bootstrap CIs and paired $t$-statistics provide the primary statistical power at $n=3$.
 
 ---
 

@@ -60,6 +60,8 @@ def parse_args(cmd_args=None):
                     help='CKA-guided: keep CBAM attention + projection layer local per client, never aggregated')
     ap.add_argument('--ultrasound_aug', action='store_true', default=False,
                     help='Apply ultrasound-specific data augmentations (Speckle noise + Elastic transform) for Hospital B')
+    ap.add_argument('--ultrasound_aug_mild', action='store_true', default=False,
+                    help='Apply milder ultrasound-specific data augmentations (SpeckleNoise(0.04, 0.3) + ElasticTransform(15.0, 4.0)) for Hospital B')
     ap.add_argument('--save_final_models', action='store_true',
                     help='Save each client final trained model state_dict for post-hoc analysis (CKA, qualitative gallery)')
     ap.add_argument('--hospital_b_subset_size', type=int, default=0,
@@ -87,6 +89,7 @@ m.cfg.COMM_ROUNDS = ARGS.rounds
 m.cfg.AGG_WEIGHT_TYPE = ARGS.agg_weight_type
 m.cfg.PERSONALIZE_DEEP = ARGS.personalize_deep
 m.cfg.ULTRASOUND_AUG = ARGS.ultrasound_aug
+m.cfg.ULTRASOUND_AUG_MILD = ARGS.ultrasound_aug_mild
 m.cfg.HOSPITAL_B_SUBSET_SIZE = ARGS.hospital_b_subset_size if ARGS.hospital_b_subset_size > 0 else None
 m.cfg.DATA_ROOT = ARGS.data_root
 m.ROOT = Path(ARGS.data_root)

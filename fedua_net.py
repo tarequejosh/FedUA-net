@@ -58,9 +58,9 @@ class Config:
     TEMP_TUNE    = True                   # temperature scaling after training
     MC_ITERS     = 30                     # MC dropout forward passes for UQ
     VAL_FRAC     = 0.15                   # brain tumor: val out of train
-    PERSONALIZE_DEEP = False              # CKA-guided: keep attention+fc+prelu local, never aggregated
+    PERSONALIZE_DEEP = False              # Depth-adaptive: keep CBAM + projection local, freeze/aggregate body only
     ULTRASOUND_AUG   = False              # Ultrasound-specific augmentations (SpeckleNoise + ElasticTransform) for Hospital B
-    SMOKE        = False                  # tiny subset for pipeline test
+    ULTRASOUND_AUG_MILD = False           # Milder ultrasound augmentations (SpeckleNoise(0.04, 0.3) + ElasticTransform(15.0, 4.0))
     AGG_WEIGHT_TYPE = 'uniform'           # 'uniform' (1/K) or 'sample' (N_k/N_total)
     HOSPITAL_B_SUBSET_SIZE = None         # None or int > 0 for data scarcity subsampling
     DATA_ROOT    = os.environ.get('DATA_ROOT', './Dataset')
@@ -220,7 +220,12 @@ def train_transforms(ultrasound=False):
         torchvision.transforms.ConvertImageDtype(torch.float),
         torchvision.transforms.Resize((256, 256), antialias=True),
     ]
-    if ultrasound:
+    if ultrasound == 'mild':
+        tfs.extend([
+            torchvision.transforms.ElasticTransform(alpha=15.0, sigma=4.0),
+            SpeckleNoise(sigma=0.04, p=0.3),
+        ])
+    elif ultrasound:
         tfs.extend([
             torchvision.transforms.ElasticTransform(alpha=25.0, sigma=4.0),
             SpeckleNoise(sigma=0.08, p=0.5),
@@ -261,7 +266,12 @@ def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_i
     is_hospital_b = (client_id == 1) or \
                     ('client' in df.columns and (df['client'] == 1).all()) or \
                     (len(df) > 0 and 'busi' in str(df['label'].iloc[0]))
-    use_us_aug = is_hospital_b and getattr(cfg, 'ULTRASOUND_AUG', False)
+    if is_hospital_b and getattr(cfg, 'ULTRASOUND_AUG_MILD', False):
+        use_us_aug = 'mild'
+    elif is_hospital_b and getattr(cfg, 'ULTRASOUND_AUG', False):
+        use_us_aug = True
+    else:
+        use_us_aug = False
     for split in ('train', 'val', 'test'):
         sub = df[df['split'] == split]
         if len(sub) == 0:

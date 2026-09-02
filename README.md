@@ -63,10 +63,12 @@ The framework is evaluated across three heterogeneous clinical cohorts represent
 ## 4. Mechanistic Interpretability & Clinical Galleries
 
 ### A. Centered Kernel Alignment (CKA) Shift (Fig. 7b)
-Linear CKA across 5 hierarchical layer tiers reveals that depth-adaptive personalization resolves deep representation collapse without sacrificing universal generic edge filters in early layers:
-- **Early Features (`features[1]`):** $CKA = 0.8350$ (shared low-level textures).
-- **Mid-Late Features (`features[5]`):** $CKA = 0.3912 \to 0.8664$ ($\Delta = +0.4752$).
-- **Dual CBAM & Projection:** Stabilized modality-specific attention recalibration.
+Linear CKA evaluated across 3 seeds ($N=210$ shared validation images) across 5 hierarchical layer tiers reveals that depth-adaptive personalization retains generic feature transfer in early layers while allowing client-specific specialization in late projection layers:
+- **Early Features (`features[1]`):** $CKA = 0.8182 \to 0.8340$ ($\Delta = +0.0158 \pm 0.0255$, $p = 0.3963$, universal edge/texture representations preserved).
+- **Mid Features (`features[3]`):** $CKA = 0.7144 \to 0.7136$ ($\Delta = -0.0007 \pm 0.0785$, $p = 0.9884$).
+- **Mid-Late Features (`features[5]`):** $CKA = 0.8524 \to 0.7992$ ($\Delta = -0.0532 \pm 0.1401$, $p = 0.5781$).
+- **Dual CBAM Attention (`attention`):** $CKA = 0.5536 \to 0.5242$ ($\Delta = -0.0294 \pm 0.2533$, $p = 0.8591$, a small, seed-variable reduction not clearly distinguishable from noise at $n=3$).
+- **Projection Head (`fc`):** $CKA = 0.3675 \to 0.1259$ ($\Delta = \mathbf{-0.2416 \pm 0.0434}$, $\mathbf{p = 0.0106}$), confirming **statistically significant decoupled client-specific representation specialization**.
 
 <p align="center">
   <img src="results/figures/fig7b_cka_before_after.png" alt="CKA Representation Shift" width="90%">

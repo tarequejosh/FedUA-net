@@ -196,6 +196,54 @@ def main():
     print("=" * 85)
     print(df_3seed[['layer', 'baseline_mean', 'baseline_std', 'pers_mean', 'pers_std', 'delta_mean', 'delta_std']].to_string(index=False))
     
+    # Paired statistical significance tests across seeds (Task 7)
+    sig_rows = []
+    from scipy import stats as sp_stats
+    for l_name in layer_labels:
+        b_seeds = np.array([baseline_seed_res[s][l_name]['mean_cka'] for s in args.seeds])
+        p_seeds = np.array([pers_seed_res[s][l_name]['mean_cka'] for s in args.seeds])
+        diff = p_seeds - b_seeds
+        
+        # Matched client pairs across seeds (3 pairs x 3 seeds = 9 matched pairs)
+        b_pairs = np.array([baseline_seed_res[s][l_name][k] for s in args.seeds for k in ['cka_A_B', 'cka_A_C', 'cka_B_C']])
+        p_pairs = np.array([pers_seed_res[s][l_name][k] for s in args.seeds for k in ['cka_A_B', 'cka_A_C', 'cka_B_C']])
+        diff_pairs = p_pairs - b_pairs
+        
+        # Paired t-test on seed means (n=3, df=2)
+        t_stat_seed, p_val_seed = sp_stats.ttest_rel(p_seeds, b_seeds)
+        
+        # Paired t-test on matched client-pairs (n=9, df=8)
+        t_stat_pairs, p_val_pairs = sp_stats.ttest_rel(p_pairs, b_pairs)
+        
+        # Verdict: check if effect is low-variance and consistent in sign across all pairs
+        all_same_sign = np.all(diff_pairs > 0) or np.all(diff_pairs < 0)
+        if p_val_seed < 0.05 and all_same_sign:
+            verdict = "consistent effect across seeds"
+        elif p_val_pairs < 0.05 and abs(np.mean(diff)) > 0.10:
+            verdict = "consistent effect across seeds (large effect, p<0.05 on pairs)"
+        else:
+            verdict = "not distinguishable from noise at this sample size"
+            
+        sig_rows.append({
+            'layer': l_name,
+            'delta_mean': float(np.mean(diff)),
+            'delta_std': float(np.std(diff, ddof=1)),
+            'paired_t_stat_seeds': float(t_stat_seed),
+            'paired_p_val_seeds': float(p_val_seed),
+            'paired_t_stat_pairs': float(t_stat_pairs),
+            'paired_p_val_pairs': float(p_val_pairs),
+            'verdict': verdict
+        })
+        
+    df_sig = pd.DataFrame(sig_rows)
+    csv_sig_path = out_dir / 'cka_significance_3seed.csv'
+    df_sig.to_csv(csv_sig_path, index=False)
+    print(f"\n[OK] CKA paired significance saved to: {csv_sig_path}")
+    print("\n" + "=" * 90)
+    print("                     CKA LAYER DELTA PAIRED STATISTICAL TESTS")
+    print("=" * 90)
+    print(df_sig[['layer', 'delta_mean', 'paired_t_stat_seeds', 'paired_p_val_seeds', 'verdict']].to_string(index=False))
+    
     # Also save single-seed for backwards compatibility if seed 0 in args.seeds
     if 0 in args.seeds:
         rows_s0 = []
