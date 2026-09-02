@@ -588,6 +588,13 @@ def _eval_arrays(net, loader):
 # ------------------------------------------------------------
 # Calibration + conformal + risk-coverage per client
 # ------------------------------------------------------------
+# METHODOLOGICAL LIMITATION NOTE:
+# In the FedUA-Net training pipeline, the validation split (loaders[c]['val']) is used for
+# early-stopping checkpoint selection during personalization fine-tuning, and then reused here
+# as the calibration set for temperature scaling (calibrate_temp) and conformal APS (conformal_aps).
+# Reusing data that guided model selection mildly violates the exchangeability assumption
+# required for formal conformal coverage guarantees. A fully conservative setup would partition
+# a distinct calibration fold separate from the model-selection validation set.
 def run_calibration(name, nets, client_dfs, loaders, seed):
     """Per-client temperature scaling + APS conformal + risk-coverage.
     ECE is computed on both raw and temperature-scaled probabilities.

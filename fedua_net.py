@@ -261,7 +261,7 @@ class MedImgDataset(Dataset):
             img = img[:3]
         return self.transform(img), self.labels[i]
 
-def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_id=None):
+def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_id=None, seed=None):
     loaders = {}
     is_hospital_b = (client_id == 1) or \
                     ('client' in df.columns and (df['client'] == 1).all()) or \
@@ -285,10 +285,12 @@ def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_i
             if is_hospital_b:
                 n_total = len(ds)
                 subset_size = min(int(hospital_b_subset_size), n_total)
-                np.random.seed(42)
-                indices = np.random.choice(n_total, size=subset_size, replace=False).tolist()
+                # Fix: subsample seed was previously hardcoded to 42 and didn't vary with the experiment seed
+                active_seed = seed if seed is not None else getattr(cfg, 'SEED', SEED)
+                rng = np.random.default_rng(active_seed)
+                indices = rng.choice(n_total, size=subset_size, replace=False).tolist()
                 ds = torch.utils.data.Subset(ds, indices)
-                print(f"[DATA SCARCITY] Hospital B training set reduced to {subset_size} images.")
+                print(f"[DATA SCARCITY] Hospital B training set reduced to {subset_size} images (seed={active_seed}).")
 
         loaders[split] = DataLoader(
             ds, batch_size=batch_size, shuffle=(split == 'train'),
@@ -296,16 +298,18 @@ def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_i
             prefetch_factor=(2 if workers > 0 else None))
     return loaders
 
-def class_weights(df, hospital_b_subset_size=None):
+def class_weights(df, hospital_b_subset_size=None, seed=None):
     """Balanced class weights across the client's train set, indexed by LOCAL class."""
     tr = df[df['split'] == 'train'].copy()
     if hospital_b_subset_size is not None and hospital_b_subset_size > 0:
         is_hospital_b = ('client' in tr.columns and (tr['client'] == 1).all()) or \
                         (len(tr) > 0 and 'busi' in str(tr['label'].iloc[0]))
         if is_hospital_b:
-            np.random.seed(42)
+            # Fix: subsample seed was previously hardcoded to 42 and didn't vary with the experiment seed
+            active_seed = seed if seed is not None else getattr(cfg, 'SEED', SEED)
+            rng = np.random.default_rng(active_seed)
             n_sample = min(int(hospital_b_subset_size), len(tr))
-            idx = np.random.choice(len(tr), size=n_sample, replace=False)
+            idx = rng.choice(len(tr), size=n_sample, replace=False)
             tr = tr.iloc[idx]
     counts = Counter(tr['local'])
     n = len(tr)
