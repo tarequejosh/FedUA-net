@@ -69,7 +69,14 @@ class Config:
 cfg = Config()
 
 def client_meta(cid):
-    """(dataset_name, prefix, classes as on disk, name)"""
+    """(dataset_name, prefix, classes as on disk, name)
+
+    JOURNAL EXTENSION (see JOURNAL_PROVENANCE.md): clients 3-4 (Dermatology,
+    Retina) are new for the journal version, scaling the benchmark from 3 to
+    5 disjoint-modality, disjoint-label hospitals -- the conference paper's
+    3-client set (cid 0-2) is preserved byte-for-byte as a subset so the
+    conference numbers stay exactly reproducible with --clients 0 1 2.
+    """
     return [
         ('brain_tumor', 'bt',
          ['glioma', 'meningioma', 'notumor', 'pituitary'],
@@ -80,6 +87,12 @@ def client_meta(cid):
         ('covid', 'cr',
          ['covid', 'lung_opacity', 'normal', 'pneumonia'],
          'Hospital_C (COVID-19 X-Ray)'),
+        ('derma', 'dm',
+         ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'],
+         'Hospital_D (Dermatology, DermaMNIST)'),
+        ('retina', 'rt',
+         ['grade0', 'grade1', 'grade2', 'grade3', 'grade4'],
+         'Hospital_E (Retina/DR Grading, RetinaMNIST)'),
     ][cid]
 
 ROOT = Path(cfg.DATA_ROOT)
@@ -87,6 +100,19 @@ DATASET_DIR = {
     'brain_tumor': ROOT / 'Brain Tumor MRI Dataset',
     'busi':        ROOT / 'Dataset_BUSI_with_GT',
     'covid':       ROOT / 'COVID-19_Radiography_Dataset',
+    'derma':       ROOT / 'medmnist' / 'dermamnist_224.npz',
+    'retina':      ROOT / 'medmnist' / 'retinamnist_224.npz',
+}
+
+# Out-of-distribution brain-MRI cohorts used ONLY for the journal's domain-shift
+# robustness stress test (Task 8 in JOURNAL_PROVENANCE.md) -- never for
+# training. Hospital A's model + conformal thresholds (fit on
+# 'Brain Tumor MRI Dataset') are evaluated, unmodified, on these held-out,
+# differently-sourced brain-tumor MRI cohorts to check whether coverage
+# guarantees survive a realistic cross-institution distribution shift.
+OOD_BRAIN_SHIFT_DIR = {
+    'brisc2025': ROOT / 'brisc2025' / 'classification_task' / 'test',
+    'pmram':     ROOT / 'PMRAM Bangladeshi Brain Cancer - MRI Dataset' / 'Raw',
 }
 
 # ------------------------------------------------------------
@@ -106,11 +132,63 @@ def list_images(d):
             out.append(str(p))
     return out
 
+def split_val_calib(paths, labels, seed):
+    """JOURNAL FIX v2 (see JOURNAL_PROVENANCE.md / REVIEW_PROVENANCE.md):
+
+    v1 of this fix (conference -> first journal submission) split the former
+    validation pool 50/50 into 'val' (checkpoint selection) and 'calib'
+    (temperature scaling + conformal calibration). That correctly stopped
+    checkpoint-selection data from leaking into calibration, but a second,
+    narrower reuse survived inside 'calib' itself: run_calibration() fit
+    temperature T on 'calib' and THEN computed the conformal nonconformity
+    scores/quantile on that same, now T-transformed, 'calib' set -- i.e. the
+    calibration data was still doing two jobs (fitting a data-dependent
+    rescaling, then supplying the exchangeable sample that rescaling is
+    scored on). A hostile-but-fair review of the first journal submission
+    caught this; see REVIEW_PROVENANCE.md.
+
+    v2 splits the former validation pool three ways instead of two:
+      - 'val'  (50%): checkpoint selection only (unchanged from v1).
+      - 'temp' (25%): temperature scaling only.
+      - 'conf' (25%): conformal nonconformity scores + quantile only.
+    'temp' and 'conf' are disjoint, and neither was used to fit T for the
+    other, so the score function (model + T) applied to 'conf' is fixed
+    before 'conf' is ever touched -- 'conf' is a genuine held-out
+    exchangeable sample with respect to both model selection ('val') and
+    temperature fitting ('temp'). This halves the old 'calib' pool again on
+    top of the v1 halving, a real further cost in calibration-set size,
+    smallest exactly on the clients that could least afford it -- see
+    JOURNAL_PROVENANCE.md for the effect on coverage variance at each
+    client's scale.
+    """
+    if len(paths) == 0:
+        return [], [], [], [], [], []
+    from sklearn.model_selection import train_test_split
+
+    def _safe_split(p, l, seed_):
+        try:
+            return train_test_split(p, l, test_size=0.5, random_state=seed_, stratify=l)
+        except ValueError:
+            # a class with a single example can't be stratified into two halves
+            return train_test_split(p, l, test_size=0.5, random_state=seed_)
+
+    val_p, rest_p, val_l, rest_l = _safe_split(paths, labels, seed)
+    if len(rest_p) == 0:
+        return val_p, val_l, [], [], [], []
+    temp_p, conf_p, temp_l, conf_l = _safe_split(rest_p, rest_l, seed)
+    return val_p, val_l, temp_p, temp_l, conf_p, conf_l
+
+
 def build_client_rows(cid, smoke=False):
     """Return DataFrame columns: path, label(global idx), split, client"""
     ds_name, prefix, cls_names, _ = client_meta(cid)
     base = DATASET_DIR[ds_name]
     rows = []  # (path, local_class_name)
+
+    if ds_name in ('derma', 'retina'):
+        df = build_medmnist_client_rows(cid, ds_name, prefix, cls_names, smoke=smoke)
+        df['client'] = cid
+        return df
 
     if ds_name == 'brain_tumor':
         # Training -> train/val, Testing -> test (use the held-out site test set)
@@ -133,13 +211,16 @@ def build_client_rows(cid, smoke=False):
                 te_rows.append((p, f'{prefix}_{cname}'))
         tr_df = pd.DataFrame(tr_rows, columns=['path', 'label'])
         from sklearn.model_selection import train_test_split
-        trp, valp, trl, vall = train_test_split(
+        trp, valpoolp, trl, valpooll = train_test_split(
             tr_df['path'].tolist(), tr_df['label'].tolist(),
             test_size=cfg.VAL_FRAC, random_state=SEED, stratify=tr_df['label'])
+        valp, vall, tempp, templ, confp, confl = split_val_calib(valpoolp, valpooll, SEED)
         te_df = pd.DataFrame(te_rows, columns=['path', 'label'])
         df = pd.concat([
             pd.DataFrame({'path': trp, 'label': trl, 'split': 'train'}),
             pd.DataFrame({'path': valp, 'label': vall, 'split': 'val'}),
+            pd.DataFrame({'path': tempp, 'label': templ, 'split': 'temp'}),
+            pd.DataFrame({'path': confp, 'label': confl, 'split': 'conf'}),
             pd.DataFrame({'path': te_df['path'].tolist(),
                           'label': te_df['label'].tolist(), 'split': 'test'}),
         ], ignore_index=True)
@@ -156,8 +237,12 @@ def build_client_rows(cid, smoke=False):
         from sklearn.model_selection import train_test_split
         tr, te = train_test_split(tmp, test_size=0.30, random_state=SEED, stratify=tmp['label'])
         val, te = train_test_split(te, test_size=0.50, random_state=SEED, stratify=te['label'])
-        tr['split'] = 'train'; val['split'] = 'val'; te['split'] = 'test'
-        df = pd.concat([tr, val, te])
+        valp, vall, tempp, templ, confp, confl = split_val_calib(val['path'].tolist(), val['label'].tolist(), SEED)
+        tr['split'] = 'train'; te['split'] = 'test'
+        val_df = pd.DataFrame({'path': valp, 'label': vall, 'split': 'val'})
+        temp_df = pd.DataFrame({'path': tempp, 'label': templ, 'split': 'temp'})
+        conf_df = pd.DataFrame({'path': confp, 'label': confl, 'split': 'conf'})
+        df = pd.concat([tr, val_df, temp_df, conf_df, te])
     else:  # covid
         name_map = {'covid': 'covid', 'lung_opacity': 'lung_opacity',
                     'normal': 'normal', 'pneumonia': 'pneumonia',
@@ -176,8 +261,12 @@ def build_client_rows(cid, smoke=False):
         from sklearn.model_selection import train_test_split
         tr, te = train_test_split(tmp, test_size=0.30, random_state=SEED, stratify=tmp['label'])
         val, te = train_test_split(te, test_size=0.50, random_state=SEED, stratify=te['label'])
-        tr['split'] = 'train'; val['split'] = 'val'; te['split'] = 'test'
-        df = pd.concat([tr, val, te])
+        valp, vall, tempp, templ, confp, confl = split_val_calib(val['path'].tolist(), val['label'].tolist(), SEED)
+        tr['split'] = 'train'; te['split'] = 'test'
+        val_df = pd.DataFrame({'path': valp, 'label': vall, 'split': 'val'})
+        temp_df = pd.DataFrame({'path': tempp, 'label': templ, 'split': 'temp'})
+        conf_df = pd.DataFrame({'path': confp, 'label': confl, 'split': 'conf'})
+        df = pd.concat([tr, val_df, temp_df, conf_df, te])
 
     if smoke:
         n = getattr(cfg, 'SMOKE_PER_CLASS', 30)
@@ -187,6 +276,125 @@ def build_client_rows(cid, smoke=False):
         df = pd.concat(keep, ignore_index=True)
     df['client'] = cid
     return df
+
+_NPZ_CACHE = {}
+_NPZ_ARRAY_CACHE = {}
+
+def _get_npz(npz_path):
+    key = str(npz_path)
+    if key not in _NPZ_CACHE:
+        _NPZ_CACHE[key] = np.load(npz_path, mmap_mode='r')
+    return _NPZ_CACHE[key]
+
+def _get_npz_array(npz_path, array_key):
+    """Materializes one named array from a .npz file exactly once and caches
+    it. NpzFile.__getitem__ re-reads and re-decompresses the ENTIRE member
+    array from the zip archive on every call (mmap_mode is silently ignored
+    for compressed .npz members, per numpy docs) -- calling it once per image
+    inside load_image_tensor's per-__getitem__ hot path cost ~4s/image on the
+    ~1GB dermamnist_224.npz 'train_images' array, making training practically
+    unrunnable. Caching the decompressed array here means the cost is paid
+    once per (file, split), not once per image access."""
+    cache_key = (str(npz_path), array_key)
+    if cache_key not in _NPZ_ARRAY_CACHE:
+        _NPZ_ARRAY_CACHE[cache_key] = np.asarray(_get_npz(npz_path)[array_key])
+    return _NPZ_ARRAY_CACHE[cache_key]
+
+def load_image_tensor(path):
+    """Loads one image as a uint8 (C,H,W) tensor. Transparently supports both
+    real image files and 'npz:<file>|<split>|<index>' virtual paths used by
+    the MedMNIST-backed journal clients (Hospital D/E), which ship as
+    pre-packaged .npz arrays (already resized to 224x224) rather than
+    individual image files, unlike the conference version's 3 file-based
+    clients. Centralized this here so every read_image call site (this
+    module's dataset, and experiment.py's pooled/embedding datasets) shares
+    one implementation."""
+    path = str(path)
+    if path.startswith('npz:'):
+        _, rest = path.split('npz:', 1)
+        npz_file, split_key, idx_str = rest.split('|')
+        arr = np.asarray(_get_npz_array(npz_file, f'{split_key}_images')[int(idx_str)])
+        if arr.ndim == 2:
+            arr = arr[:, :, None]
+        return torch.from_numpy(arr.copy()).permute(2, 0, 1).contiguous()
+    return torchvision.io.read_image(path)
+
+def build_medmnist_client_rows(cid, ds_name, prefix, cls_names, smoke=False):
+    """Builds the (path, label, split) DataFrame for an .npz-backed MedMNIST
+    client (Hospital D: DermaMNIST, Hospital E: RetinaMNIST) -- NEW for the
+    journal version (see JOURNAL_PROVENANCE.md). Uses MedMNIST's own
+    official train/val/test partition, then applies the same val->val+calib
+    fix (split_val_calib) used for the 3 conference clients, so all 5
+    clients follow one consistent, exchangeability-respecting protocol."""
+    npz_path = DATASET_DIR[ds_name]
+    if not Path(npz_path).exists():
+        print(f'[WARN] MedMNIST file not found for client {cid} ({ds_name}): {npz_path}')
+        return pd.DataFrame(columns=['path', 'label', 'split'])
+    npz = _get_npz(npz_path)
+    rows = []
+    for medmnist_split, our_split in (('train', 'train'), ('val', '__valpool__'), ('test', 'test')):
+        labels_key = f'{medmnist_split}_labels'
+        if labels_key not in npz:
+            continue
+        labels = np.asarray(npz[labels_key]).reshape(-1)
+        for i in range(len(labels)):
+            cls_idx = int(labels[i])
+            if not (0 <= cls_idx < len(cls_names)):
+                continue
+            path_ref = f'npz:{npz_path}|{medmnist_split}|{i}'
+            rows.append((path_ref, f'{prefix}_{cls_names[cls_idx]}', our_split))
+    df = pd.DataFrame(rows, columns=['path', 'label', 'split'])
+    if len(df) == 0:
+        return df
+    pool_mask = df['split'] == '__valpool__'
+    pool = df[pool_mask]
+    valp, vall, tempp, templ, confp, confl = split_val_calib(pool['path'].tolist(), pool['label'].tolist(), SEED)
+    df = df[~pool_mask]
+    df = pd.concat([
+        df,
+        pd.DataFrame({'path': valp, 'label': vall, 'split': 'val'}),
+        pd.DataFrame({'path': tempp, 'label': templ, 'split': 'temp'}),
+        pd.DataFrame({'path': confp, 'label': confl, 'split': 'conf'}),
+    ], ignore_index=True)
+    if smoke:
+        n = getattr(cfg, 'SMOKE_PER_CLASS', 30)
+        keep = []
+        for (_s, _l), g in df.groupby(['split', 'label'], sort=False):
+            keep.append(g.head(n))
+        df = pd.concat(keep, ignore_index=True)
+    return df
+
+def load_ood_brain_shift(cohort='brisc2025'):
+    """JOURNAL EXTENSION, robustness stress test only (see
+    JOURNAL_PROVENANCE.md Task 8) -- NEVER used for training. Loads a
+    held-out, differently-sourced brain-tumor MRI cohort ('brisc2025' or
+    'pmram': the Bangladeshi PMRAM cohort) mapped onto Hospital A's exact
+    4-class scheme (glioma/meningioma/notumor/pituitary), so Hospital A's
+    already-trained model and conformal thresholds can be evaluated,
+    unmodified, under a realistic cross-institution domain shift."""
+    cls_names = client_meta(0)[2]
+    base = OOD_BRAIN_SHIFT_DIR[cohort]
+    name_map = {
+        'glioma': 'glioma', 'meningioma': 'meningioma',
+        'no_tumor': 'notumor', 'notumor': 'notumor', 'normal': 'notumor',
+        'pituitary': 'pituitary',
+        '512glioma': 'glioma', '512meningioma': 'meningioma',
+        '512normal': 'notumor', '512pituitary': 'pituitary',
+    }
+    paths, labels = [], []
+    if not base.exists():
+        print(f'[WARN] OOD brain-shift cohort not found: {base}')
+        return pd.DataFrame(columns=['path', 'label'])
+    for cdir in sorted(base.iterdir()):
+        if not cdir.is_dir():
+            continue
+        cname = name_map.get(cdir.name.lower().strip())
+        if cname is None or cname not in cls_names:
+            continue
+        for p in list_images(cdir):
+            paths.append(p)
+            labels.append(cname)
+    return pd.DataFrame({'path': paths, 'label': labels})
 
 def discover_all(smoke=False):
     frames = [build_client_rows(cid, smoke) for cid in range(cfg.NUM_CLIENTS)]
@@ -254,7 +462,7 @@ class MedImgDataset(Dataset):
     def __len__(self):
         return len(self.paths)
     def __getitem__(self, i):
-        img = torchvision.io.read_image(self.paths[i])  # (C,H,W) uint8
+        img = load_image_tensor(self.paths[i])  # (C,H,W) uint8
         if img.shape[0] == 1:
             img = img.repeat(3, 1, 1)
         elif img.shape[0] > 3:
@@ -272,7 +480,11 @@ def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_i
         use_us_aug = True
     else:
         use_us_aug = False
-    for split in ('train', 'val', 'test'):
+    # JOURNAL FIX v2: 'temp' and 'conf' are two further splits, disjoint from
+    # 'val' and from each other -- 'temp' for temperature scaling only,
+    # 'conf' for conformal nonconformity scores/quantile only -- see
+    # split_val_calib().
+    for split in ('train', 'val', 'temp', 'conf', 'test'):
         sub = df[df['split'] == split]
         if len(sub) == 0:
             loaders[split] = None
@@ -295,7 +507,8 @@ def build_loaders(df, batch_size, workers, hospital_b_subset_size=None, client_i
         loaders[split] = DataLoader(
             ds, batch_size=batch_size, shuffle=(split == 'train'),
             num_workers=workers, pin_memory=True, drop_last=(split == 'train' and len(ds) >= batch_size),
-            prefetch_factor=(2 if workers > 0 else None))
+            prefetch_factor=(2 if workers > 0 else None),
+            persistent_workers=(workers > 0))
     return loaders
 
 def class_weights(df, hospital_b_subset_size=None, seed=None):

@@ -39,12 +39,17 @@ def aggregate_weights(
         if not global_dict[key].is_floating_point():
             continue
 
-        # Weighted average across participating clients
+        # Weighted average across participating clients. Client models (e.g.
+        # FedUANetClientModel) wrap the backbone as `self.backbone`, so their
+        # state_dict keys are prefixed with "backbone." relative to a bare
+        # backbone's own keys -- check both forms before giving up on a key.
         weighted_param = torch.zeros_like(global_dict[key])
         for idx, client_model in enumerate(client_models):
             client_dict = client_model.state_dict()
             if key in client_dict:
                 weighted_param += norm_weights[idx] * client_dict[key].to(global_dict[key].device)
+            elif f"backbone.{key}" in client_dict:
+                weighted_param += norm_weights[idx] * client_dict[f"backbone.{key}"].to(global_dict[key].device)
 
         updated_dict[key] = weighted_param
 

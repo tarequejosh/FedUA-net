@@ -52,8 +52,11 @@ def main():
     df = load_raw()
     df['client'] = df['client'].astype(str)
     
-    # Filter out pooled row from per-client average for centralized
-    df_clients_only = df[df['client'].isin(['0', '1', '2'])]
+    # Filter out pooled row from per-client average for centralized. Uses an
+    # exclusion filter (not a hardcoded client-id allowlist) so this correctly
+    # includes all active clients whether running the 3-client conference
+    # benchmark or the 5-client journal scale-up (Hospital D/E).
+    df_clients_only = df[df['client'] != 'pooled']
     
     # Per-seed, per-strategy mean over the 3 clients
     mean_entry = df_clients_only.groupby(['seed', 'strategy']).agg(
@@ -98,7 +101,9 @@ def main():
     client_names = {
         '0': 'Hospital A (Brain-Tumor MRI)',
         '1': 'Hospital B (Breast Ultrasound)',
-        '2': 'Hospital C (COVID-19 X-Ray)'
+        '2': 'Hospital C (COVID-19 X-Ray)',
+        '3': 'Hospital D (Dermatology, DermaMNIST)',
+        '4': 'Hospital E (Retina/DR Grading, RetinaMNIST)',
     }
     
     met_rows = []

@@ -34,12 +34,20 @@ from torch.utils.data import Dataset, DataLoader
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import fedua_net as m
+from src.uncertainty.federated_conformal import (
+    ClientCalibrationData, federated_conformal_calibrate, evaluate_federated_modes)
 
 os.environ.setdefault('TORCH_HOME', str(Path(__file__).resolve().parent / '.torch_cache'))
 
-MTHIS_NUM_CLIENTS = 3   # 3 clients: Brain MRI / Breast US / COVID X-ray
-m.cfg.NUM_CLIENTS = MTHIS_NUM_CLIENTS
-m.cfg.LOCAL_EPOCHS = {0: 4, 1: 10, 2: 2}
+# JOURNAL EXTENSION (see JOURNAL_PROVENANCE.md): --num_clients selects how many
+# of the 5 defined hospitals (fedua_net.client_meta) participate.
+#   3 (default) = EXACT conference benchmark: Brain MRI / Breast US / COVID X-ray.
+#   5           = journal scale-up: adds Hospital D (Dermatology, DermaMNIST)
+#                 and Hospital E (Retina/DR grading, RetinaMNIST).
+# Per-client local-epoch schedule: entries 0-2 are unchanged from the
+# conference version (byte-identical reproduction at --num_clients 3);
+# 3-4 are new defaults for the smaller MedMNIST-derived clients.
+m.cfg.LOCAL_EPOCHS = {0: 4, 1: 10, 2: 2, 3: 6, 4: 8}
 
 # ------------------------------------------------------------
 # CLI
@@ -66,6 +74,26 @@ def parse_args(cmd_args=None):
                     help='Save each client final trained model state_dict for post-hoc analysis (CKA, qualitative gallery)')
     ap.add_argument('--hospital_b_subset_size', type=int, default=0,
                     help="Subsample size for Hospital B training dataset (0 = use all data)")
+    ap.add_argument('--num_clients', type=int, default=3, choices=[3, 4, 5],
+                    help='JOURNAL: 3 = exact conference benchmark (Brain MRI/Breast US/COVID X-ray). '
+                         '5 = scale-up adding Hospital D (Dermatology) + Hospital E (Retina).')
+    ap.add_argument('--federated_conformal', action='store_true', default=False,
+                    help='JOURNAL: in addition to the legacy independent per-client conformal '
+                         'calibration, run the genuinely federated group-conditional/marginal/'
+                         'shrinkage calibration (src/uncertainty/federated_conformal.py) on the '
+                         'dedicated calib split (see JOURNAL_PROVENANCE.md).')
+    ap.add_argument('--ood_eval', nargs='*', default=[], choices=['brisc2025', 'pmram'],
+                    help='JOURNAL: evaluate Hospital A (client 0) test-time on these out-of-'
+                         'distribution brain-MRI cohorts for the domain-shift robustness stress '
+                         'test, without any retraining. Requires client 0 to be active.')
+    ap.add_argument('--workers', type=int, default=0,
+                    help='DataLoader worker processes per loader (0 = load in main process, '
+                         'the default and the only value verified stable on this machine -- '
+                         'each worker is a spawned subprocess that re-imports torch+CUDA, and '
+                         'this environment\'s paging file is too small to hold more than one '
+                         'concurrent CUDA runtime load, so nonzero values here can crash with '
+                         'WinError 1455. Only raise this after increasing the system paging '
+                         'file / virtual memory size.')
     ap.add_argument('--smoke', action='store_true')
     ap.add_argument('--loco', action='store_true', help='run LOCO generalization')
     ap.add_argument('--out', default='./outputs_experiments')
@@ -93,10 +121,20 @@ m.cfg.ULTRASOUND_AUG_MILD = ARGS.ultrasound_aug_mild
 m.cfg.HOSPITAL_B_SUBSET_SIZE = ARGS.hospital_b_subset_size if ARGS.hospital_b_subset_size > 0 else None
 m.cfg.DATA_ROOT = ARGS.data_root
 m.ROOT = Path(ARGS.data_root)
+# NOTE: m.DATASET_DIR / m.OOD_BRAIN_SHIFT_DIR are already fully defined in
+# fedua_net.py (including the journal's derma/retina/OOD paths) relative to
+# m.ROOT at import time; we only need to re-root them if --data_root differs
+# from the default './Dataset'.
 m.DATASET_DIR = {
     'brain_tumor': m.ROOT / 'Brain Tumor MRI Dataset',
     'busi':        m.ROOT / 'Dataset_BUSI_with_GT',
     'covid':       m.ROOT / 'COVID-19_Radiography_Dataset',
+    'derma':       m.ROOT / 'medmnist' / 'dermamnist_224.npz',
+    'retina':      m.ROOT / 'medmnist' / 'retinamnist_224.npz',
+}
+m.OOD_BRAIN_SHIFT_DIR = {
+    'brisc2025': m.ROOT / 'brisc2025' / 'classification_task' / 'test',
+    'pmram':     m.ROOT / 'PMRAM Bangladeshi Brain Cancer - MRI Dataset' / 'Raw',
 }
 
 # ------------------------------------------------------------
@@ -106,11 +144,11 @@ def build_data(seed):
     """Discover data with seed-dependent split; return client_dfs (with local
     labels) + global classes."""
     m.SEED = seed
-    m.cfg.NUM_CLIENTS = MTHIS_NUM_CLIENTS
+    m.cfg.NUM_CLIENTS = ARGS.num_clients
     all_df, classes, class_to_idx = m.discover_all(smoke=ARGS.smoke)
     all_df['gid'] = all_df['label'].map(class_to_idx)
     client_dfs = {}
-    for cid in range(MTHIS_NUM_CLIENTS):
+    for cid in range(ARGS.num_clients):
         sub = all_df[all_df['client'] == cid].copy()
         uniq = sorted(sub['gid'].unique())
         g2l = {g: i for i, g in enumerate(uniq)}
@@ -119,7 +157,7 @@ def build_data(seed):
     return all_df, classes, class_to_idx, client_dfs
 
 def loaders_for(df, client_id=None):
-    return m.build_loaders(df, ARGS.batch, 0, hospital_b_subset_size=ARGS.hospital_b_subset_size, client_id=client_id)
+    return m.build_loaders(df, ARGS.batch, ARGS.workers, hospital_b_subset_size=ARGS.hospital_b_subset_size, client_id=client_id)
 
 def train_size(df):
     return int((df['split'] == 'train').sum())
@@ -313,7 +351,7 @@ def run_strategy(name, client_dfs, client_ids, ncls_local, cw, loaders, seed,
             freeze = (name == 'fedbabu')
             prox_ref_body = ref_sd if (name in ('fedprox', 'ditto')) else None
             local_train(nets[c], loaders[c]['train'], loaders[c]['val'], cw[c],
-                        m.cfg.LOCAL_EPOCHS[c], lr_b, lr_h, device,
+                        m.cfg.LOCAL_EPOCHS.get(c, 4), lr_b, lr_h, device,
                         prox_ref=prox_ref_body, prox_mu=prox_mu,
                         freeze_head=freeze, tag=f'{name}/c{c}/r{rnd}')
             if name == 'ditto':
@@ -365,15 +403,17 @@ def run_centralized(client_dfs, classes, seed, device, attention=None):
             self.tf = tf
         def __len__(self): return len(self.paths)
         def __getitem__(self, i):
-            img = torchvision.io.read_image(self.paths[i])
+            img = m.load_image_tensor(self.paths[i])
             if img.shape[0] == 1: img = img.repeat(3, 1, 1)
             elif img.shape[0] > 3: img = img[:3]
             return self.tf(img), self.y[i], self.c[i]
 
     trds = GidDS(tr, m.train_transforms())
     teds = GidDS(te, m.eval_transforms())
-    tr_loader = DataLoader(trds, batch_size=ARGS.batch, shuffle=True, num_workers=0)
-    te_loader = DataLoader(teds, batch_size=ARGS.batch, shuffle=False, num_workers=0)
+    tr_loader = DataLoader(trds, batch_size=ARGS.batch, shuffle=True, num_workers=ARGS.workers,
+                           pin_memory=True, persistent_workers=(ARGS.workers > 0))
+    te_loader = DataLoader(teds, batch_size=ARGS.batch, shuffle=False, num_workers=ARGS.workers,
+                           pin_memory=True)
 
     net = m.ClientNet(len(classes), m.cfg.BACKBONE, m.cfg.EMB, m.cfg.DROPOUT, attention=attention).to(device)
     epochs = 8
@@ -407,6 +447,25 @@ def run_centralized(client_dfs, classes, seed, device, attention=None):
 # ------------------------------------------------------------
 # Metrics
 # ------------------------------------------------------------
+def compute_ece(y_true, y_prob, n_bins=15):
+    """15-equal-width-bin expected calibration error. Factored out of
+    full_metrics so calibrate_temp() can use the exact same definition to
+    judge whether a fitted temperature actually helped (see REVIEW_PROVENANCE.md)."""
+    y_true = np.asarray(y_true); y_prob = np.asarray(y_prob)
+    y_pred = y_prob.argmax(1)
+    conf = y_prob.max(1); correct = (y_pred == y_true).astype(float)
+    bin_edges = np.linspace(0.0, 1.0, n_bins + 1)
+    ece = 0.0
+    for i in range(n_bins):
+        lo, hi = bin_edges[i], bin_edges[i + 1]
+        mask = (conf >= lo) & (conf <= hi) if i == n_bins - 1 else (conf >= lo) & (conf < hi)
+        if mask.sum() == 0:
+            continue
+        avg_conf = float(conf[mask].mean())
+        avg_acc  = float(correct[mask].mean())
+        ece += (mask.sum() / len(conf)) * abs(avg_conf - avg_acc)
+    return float(ece)
+
 def full_metrics(y_true, y_prob):
     from sklearn.metrics import (accuracy_score, precision_recall_fscore_support,
                                  matthews_corrcoef, roc_curve, auc)
@@ -425,19 +484,7 @@ def full_metrics(y_true, y_prob):
         aucs.append(auc(fpr, tpr))
     auc_mean = float(np.nanmean(aucs)) if aucs else float('nan')
 
-    # ECE — 15 equal-width bins
-    conf = y_prob.max(1); correct = (y_pred == y_true).astype(float)
-    n_bins = 15
-    bin_edges = np.linspace(0.0, 1.0, n_bins + 1)
-    ece = 0.0
-    for i in range(n_bins):
-        lo, hi = bin_edges[i], bin_edges[i + 1]
-        mask = (conf >= lo) & (conf <= hi) if i == n_bins - 1 else (conf >= lo) & (conf < hi)
-        if mask.sum() == 0:
-            continue
-        avg_conf = float(conf[mask].mean())
-        avg_acc  = float(correct[mask].mean())
-        ece += (mask.sum() / len(conf)) * abs(avg_conf - avg_acc)
+    ece = compute_ece(y_true, y_prob)
 
     # Brier score
     onehot = np.zeros_like(y_prob)
@@ -463,6 +510,11 @@ def collect_logits(net, loader, device):
 
 def calibrate_temp(net, cal_loader, device):
     logits, labels = collect_logits(net, cal_loader, device)
+    return fit_temp(logits, labels)
+
+def fit_temp(logits, labels):
+    """calibrate_temp() on already-collected logits (lets
+    scripts/rescore_from_checkpoints.py fit T from cached logits)."""
     T = nn.Parameter(torch.tensor(1.0))
     opt = torch.optim.LBFGS([T], lr=0.05, max_iter=30)
     def closure():
@@ -472,7 +524,35 @@ def calibrate_temp(net, cal_loader, device):
         return loss
     for _ in range(15):
         opt.step(closure)
-    return max(float(T.item()), 0.05)
+    # LBFGS on a degenerate/near-separable calibration batch can run away
+    # toward T -> inf instead of converging (observed: T=28963 on a small,
+    # 7-class client in one seed) -- clamp to a sane operating range rather
+    # than let one divergent fit silently corrupt cross-seed aggregates.
+    T_fit = min(max(float(T.item()), 0.05), 50.0)
+    # REVIEW FIX v2 (see REVIEW_PROVENANCE.md): clamping bounds T but does
+    # not guarantee the clamped value actually calibrates better than doing
+    # nothing. Once the calibration pool was split again into 'temp'/'conf'
+    # (halving an already-small set, see fedua_net.split_val_calib), this
+    # stopped being rare: a single catastrophically-misclassified example in
+    # a small 'temp' batch can make cross-entropy loss itself prefer a huge
+    # T (flattening that one example's otherwise-enormous -log(p) term
+    # toward the uniform-distribution loss), even though that same huge T
+    # destroys calibration for every correctly-classified example in the
+    # batch. v1 of this fix compared NLL on 'temp' before/after fitting and
+    # missed exactly this case, because NLL is what LBFGS was already
+    # (correctly, from its own point of view) minimizing -- the problem is
+    # that minimizing NLL on a handful of examples is not the same as
+    # improving calibration. ECE is: it bins by confidence and averages a
+    # bounded |confidence - accuracy| term per bin, so one extreme-loss
+    # outlier cannot dominate it the way it dominates an unbounded -log(p)
+    # sum. We therefore accept T_fit only if it improves ECE, not NLL, on
+    # the same 'temp' data it was fit on; otherwise we fall back to T=1.
+    probs_uncal = torch.softmax(logits, dim=-1).numpy()
+    probs_fit   = torch.softmax(logits / T_fit, dim=-1).numpy()
+    labels_np = labels.numpy()
+    ece_uncal = compute_ece(labels_np, probs_uncal)
+    ece_fit   = compute_ece(labels_np, probs_fit)
+    return T_fit if ece_fit <= ece_uncal else 1.0
 
 def conformal_aps(cal_prob, cal_label, test_prob, alpha=0.1):
     """Adaptive Prediction Sets (per client) using exact conformal classification.
@@ -526,11 +606,11 @@ def extract_embeddings(net, df, device):
             s.paths = df['path'].tolist(); s.y = df['gid'].tolist()
         def __len__(s): return len(s.paths)
         def __getitem__(s, i):
-            img = torchvision.io.read_image(s.paths[i])
+            img = m.load_image_tensor(s.paths[i])
             if img.shape[0] == 1: img = img.repeat(3, 1, 1)
             elif img.shape[0] > 3: img = img[:3]
             return tf(img), s.y[i]
-    loader = DataLoader(DS(), batch_size=64, shuffle=False, num_workers=0)
+    loader = DataLoader(DS(), batch_size=64, shuffle=False, num_workers=ARGS.workers, pin_memory=True)
     emb, ys = [], []
     net.eval()
     body = getattr(net, 'body', net)
@@ -567,6 +647,73 @@ def run_loco(client_dfs, ncls_local, cw, seed, device, rounds=8):
                      'mcc': float(matthews_corrcoef(y_te, pred))})
     return rows
 
+# ------------------------------------------------------------
+# JOURNAL: domain-shift robustness stress test (Task 8, JOURNAL_PROVENANCE.md)
+# ------------------------------------------------------------
+def run_ood_eval(name, nets, loaders, seed, cohorts):
+    """Evaluates the already-trained Hospital A (client 0) model -- with its
+    already-fit temperature T and, separately, a conformal threshold fit on
+    Hospital A's own in-distribution 'conf' split -- on out-of-distribution
+    brain-MRI cohorts (brisc2025 and/or the Bangladeshi PMRAM cohort) it was
+    NEVER trained or calibrated on. No retraining, no recalibration on OOD
+    data: this measures whether accuracy and, crucially, conformal coverage
+    survive a realistic cross-institution distribution shift, or silently
+    fail (which would itself be an important, honestly-reported finding).
+
+    T is fit on 'temp' and the conformal quantile on 'conf' -- two disjoint
+    splits (see fedua_net.split_val_calib) -- so the conformal score function
+    (model + T) is fixed before 'conf' is scored, same as run_calibration()."""
+    if 0 not in nets or not cohorts:
+        return pd.DataFrame()
+    net = nets[0]
+    temp_loader = loaders[0].get('temp')
+    conf_loader = loaders[0].get('conf')
+    if temp_loader is None or conf_loader is None:
+        return pd.DataFrame()
+    T = calibrate_temp(net, temp_loader, DEV)
+    cal_logits, cal_y = collect_logits(net, conf_loader, DEV)
+    cal_p = torch.softmax(cal_logits / T, dim=-1).numpy()
+    cal_y = cal_y.numpy()
+
+    cls_names = m.client_meta(0)[2]
+    rows = []
+    for cohort in cohorts:
+        ood_df = m.load_ood_brain_shift(cohort)
+        if len(ood_df) == 0:
+            print(f'[ood_eval] {cohort}: no data found under Dataset/, skipping.')
+            continue
+        ood_df = ood_df.copy()
+        ood_df['local'] = ood_df['label'].map(lambda lbl: sorted(cls_names).index(lbl))
+        tf = m.eval_transforms()
+
+        class OODDS(Dataset):
+            def __init__(self, df):
+                self.paths = df['path'].tolist(); self.y = df['local'].tolist()
+            def __len__(self): return len(self.paths)
+            def __getitem__(self, i):
+                img = m.load_image_tensor(self.paths[i])
+                if img.shape[0] == 1: img = img.repeat(3, 1, 1)
+                elif img.shape[0] > 3: img = img[:3]
+                return tf(img), self.y[i]
+
+        ood_loader = DataLoader(OODDS(ood_df), batch_size=ARGS.batch, shuffle=False, num_workers=ARGS.workers, pin_memory=True)
+        ood_logits, ood_y = collect_logits(net, ood_loader, DEV)
+        ood_p = torch.softmax(ood_logits / T, dim=-1).numpy()
+        ood_y = ood_y.numpy()
+        met = full_metrics(ood_y, ood_p)
+        for alpha in (0.05, 0.10, 0.20):
+            sets, qhat = conformal_aps(cal_p, cal_y, ood_p, alpha=alpha)
+            cover = float(np.mean([ood_y[i] in sets[i] for i in range(len(ood_y))]))
+            size = float(np.mean([len(s) for s in sets]))
+            rows.append({'strategy': name, 'seed': seed, 'cohort': cohort,
+                         'n_ood': len(ood_y), 'acc': met['acc'], 'f1': met['f1'],
+                         'ece': met['ece'], 'alpha': alpha, 'coverage': cover,
+                         'mean_set_size': size, 'qhat_from_id_calib': qhat})
+        print(f'  [ood_eval] {cohort}: n={len(ood_y)} acc={met["acc"]*100:.2f}% '
+              f'(in-distribution calib threshold, no recalibration)')
+    return pd.DataFrame(rows)
+
+
 def _softmax_from_logits(logits):
     ex = np.exp(logits - logits.max(1, keepdims=True))
     return ex / ex.sum(1, keepdims=True)
@@ -588,25 +735,54 @@ def _eval_arrays(net, loader):
 # ------------------------------------------------------------
 # Calibration + conformal + risk-coverage per client
 # ------------------------------------------------------------
-# METHODOLOGICAL LIMITATION NOTE:
-# In the FedUA-Net training pipeline, the validation split (loaders[c]['val']) is used for
-# early-stopping checkpoint selection during personalization fine-tuning, and then reused here
-# as the calibration set for temperature scaling (calibrate_temp) and conformal APS (conformal_aps).
-# Reusing data that guided model selection mildly violates the exchangeability assumption
-# required for formal conformal coverage guarantees. A fully conservative setup would partition
-# a distinct calibration fold separate from the model-selection validation set.
-def run_calibration(name, nets, client_dfs, loaders, seed):
-    """Per-client temperature scaling + APS conformal + risk-coverage.
-    ECE is computed on both raw and temperature-scaled probabilities.
-    Writes cal_{name}_seed{seed}.csv to RAW."""
+# JOURNAL FIX v2 (was a METHODOLOGICAL LIMITATION even in the first journal
+# submission -- see fedua_net.split_val_calib's docstring and
+# REVIEW_PROVENANCE.md for the full history):
+# v1 reused loaders[c]['val'] (the split that guided personalization/
+# early-stopping checkpoint selection) as the calibration set for BOTH
+# temperature scaling and conformal APS -- fixed by carving out a disjoint
+# 'calib' split never used for model selection. But v1's 'calib' was then
+# used TWICE within itself: once to fit temperature T, and again (after
+# applying that same T) to compute the conformal nonconformity scores and
+# quantile -- so the calibration data still did two jobs, and the model
+# selection fix did not by itself give conformal validity.
+# v2 fixes this by splitting the old 'calib' pool once more into 'temp'
+# (temperature scaling only) and 'conf' (conformal scores/quantile only,
+# scored under the T already fixed on the disjoint 'temp' set). 'val' is
+# unchanged and remains reserved for early-stopping only.
+def run_calibration(name, nets, client_dfs, loaders, seed, run_federated=False):
+    """Per-client temperature scaling (on 'temp') + legacy independent APS
+    conformal + risk-coverage (on 'conf', disjoint from 'temp'). Writes
+    cal_{name}_seed{seed}.csv to RAW.
+
+    When run_federated=True, ALSO runs the genuinely federated group-
+    conditional conformal calibration (src/uncertainty/federated_conformal.py)
+    across all participating clients at once and writes
+    fedconformal_{name}_seed{seed}.csv to RAW, comparing 3 modes per client:
+      - 'group'              : Mondrian/per-client threshold from ONLY that
+                                client's calib scores (this is what 'legacy'
+                                independent per-client conformal reduces to,
+                                just computed via the shared federated code
+                                path instead of a separate implementation).
+      - 'marginal_federated'  : one pooled threshold across ALL clients'
+                                (compressed, never-raw-shared) calib scores.
+      - 'shrunk'              : per-client threshold shrunk toward the pooled
+                                threshold in proportion to how little
+                                calibration data that client has.
+    """
     rows = []
+    fed_calib_data, fed_test_data = [], []
     for c in client_dfs:
         net = nets[c]
-        cal_loader = loaders[c]['val']; te_loader = loaders[c]['test']
-        if cal_loader is None or te_loader is None:
+        temp_loader = loaders[c].get('temp'); conf_loader = loaders[c].get('conf')
+        te_loader = loaders[c]['test']
+        if temp_loader is None or conf_loader is None or te_loader is None:
             continue
-        T = calibrate_temp(net, cal_loader, DEV)
-        cal_logits, cal_y = collect_logits(net, cal_loader, DEV)
+        # T is fit on 'temp'; the conformal score/quantile is computed on
+        # 'conf' -- disjoint from 'temp', so T is fixed before 'conf' is
+        # scored (see run_calibration's module-level comment above).
+        T = calibrate_temp(net, temp_loader, DEV)
+        cal_logits, cal_y = collect_logits(net, conf_loader, DEV)
         te_logits,  te_y  = collect_logits(net, te_loader,  DEV)
 
         cal_p_raw = torch.softmax(cal_logits, dim=-1).numpy()
@@ -619,11 +795,11 @@ def run_calibration(name, nets, client_dfs, loaders, seed):
         met     = full_metrics(te_y, te_p)
         rows.append({'strategy': name, 'seed': seed, 'client': c,
                      'client_name': m.client_meta(c)[3],
-                     'metric': 'calib', 'temp': T,
+                     'metric': 'calib', 'temp': T, 'n_calib': len(cal_y),
                      'ece_raw':   met_raw['ece'],   'brier_raw': met_raw['brier'],
                      'ece_cal':   met['ece'],        'brier_cal': met['brier'],
                      'acc_uncal': met_raw['acc'],    'acc_cal':   met['acc']})
-        # conformal APS
+        # legacy independent per-client conformal APS (now on the fixed split)
         for alpha in (0.05, 0.10, 0.20):
             sets, qhat = conformal_aps(cal_p, cal_y, te_p, alpha=alpha)
             cover = float(np.mean([te_y[i] in sets[i] for i in range(len(te_y))]))
@@ -641,8 +817,31 @@ def run_calibration(name, nets, client_dfs, loaders, seed):
         for k, v in rc['acc_at_cov'].items():
             rc_row[f'acc_at_cov_{k}'] = v
         rows.append(rc_row)
+
+        if run_federated:
+            cname = m.client_meta(c)[3]
+            fed_calib_data.append(ClientCalibrationData(cname, cal_p, cal_y))
+            fed_test_data.append(ClientCalibrationData(cname, te_p, te_y))
+
     df = pd.DataFrame(rows)
     df.to_csv(RAW / f'cal_{name}_seed{seed}.csv', index=False)
+
+    if run_federated and len(fed_calib_data) >= 2:
+        fed_rows = []
+        for alpha in (0.05, 0.10, 0.20):
+            result = federated_conformal_calibrate(fed_calib_data, alpha=alpha)
+            modes = evaluate_federated_modes(result, fed_test_data)
+            for cname, mode_metrics in modes.items():
+                for mode, vals in mode_metrics.items():
+                    fed_rows.append({
+                        'strategy': name, 'seed': seed, 'client_name': cname,
+                        'alpha': alpha, 'mode': mode,
+                        'n_calib': result.n_cal.get(cname), **vals,
+                        'shrinkage_weight': result.shrinkage_weight.get(cname),
+                    })
+        fed_df = pd.DataFrame(fed_rows)
+        fed_df.to_csv(RAW / f'fedconformal_{name}_seed{seed}.csv', index=False)
+
     return df
 
 # ------------------------------------------------------------
@@ -700,8 +899,13 @@ def main():
                 ckpt_dir.mkdir(parents=True, exist_ok=True)
                 for c in cids:
                     torch.save(nets[c].state_dict(), ckpt_dir / f'{name}_seed{seed}_client{c}.pt')
-            run_calibration(name, nets, client_dfs, loaders, seed)
+            run_calibration(name, nets, client_dfs, loaders, seed,
+                            run_federated=ARGS.federated_conformal)
             print(f'  [{name}] calibration/conformal done')
+            if name == 'fedua' and ARGS.ood_eval:
+                ood_df = run_ood_eval(name, nets, loaders, seed, ARGS.ood_eval)
+                if len(ood_df) > 0:
+                    ood_df.to_csv(RAW / f'ood_{name}_seed{seed}.csv', index=False)
 
         # centralized (pooled, once per seed)
         if 'centralized' in ARGS.strategies:
