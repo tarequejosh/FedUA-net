@@ -88,3 +88,12 @@ PROGRESS.md
 *.toc
 *.out
 
+
+# Journal results are versioned (docs/REPRODUCE_JOURNAL.md); checkpoints are
+# hosted separately and the image-hash cache holds machine-specific paths.
+!outputs_journal_3client/
+!outputs_journal_5client/
+!outputs_journal_3client_v2/
+!outputs_journal_5client_v2/
+outputs_journal_*/final_models/
+outputs_journal_*/rescore/dhash_store.npz

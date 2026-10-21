@@ -1,0 +1,229 @@
+PyTorch 2.11.0+cu128 | device=cuda | Attention=cbam
+GPU=NVIDIA GeForce RTX 5060  free VRAM 6.9GB
+
+========== SEED 0 ==========
+agg_weights (uniform): {0: 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.25% | F1=96.21% | MCC=0.951 | ECE=0.0681 | Brier=0.0643
+  [Hospital_B (Breast Ultrasound)] Acc=81.20% | F1=78.49% | MCC=0.699 | ECE=0.0807 | Brier=0.2652
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.25% | F1=96.79% | MCC=0.943 | ECE=0.0687 | Brier=0.0681
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=80.95% | F1=71.27% | MCC=0.686 | ECE=0.0456 | Brier=0.2806
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=61.00% | F1=52.29% | MCC=0.456 | ECE=0.1108 | Brier=0.5468
+  [fedbn] done in 8822.7s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.50% | F1=96.45% | MCC=0.954 | ECE=0.0662 | Brier=0.0602
+  [Hospital_B (Breast Ultrasound)] Acc=85.47% | F1=83.32% | MCC=0.763 | ECE=0.0982 | Brier=0.2505
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.31% | F1=96.78% | MCC=0.944 | ECE=0.0705 | Brier=0.0671
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=81.75% | F1=73.38% | MCC=0.692 | ECE=0.0525 | Brier=0.2757
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=61.00% | F1=50.75% | MCC=0.463 | ECE=0.0989 | Brier=0.5397
+  [fedprox] done in 9746.1s
+  [fedprox] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.06% | F1=96.00% | MCC=0.948 | ECE=0.0591 | Brier=0.0650
+  [Hospital_B (Breast Ultrasound)] Acc=89.74% | F1=89.07% | MCC=0.831 | ECE=0.0836 | Brier=0.1739
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.97% | F1=96.45% | MCC=0.938 | ECE=0.0584 | Brier=0.0686
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=83.79% | F1=74.06% | MCC=0.718 | ECE=0.0364 | Brier=0.2512
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=59.75% | F1=49.75% | MCC=0.436 | ECE=0.2066 | Brier=0.5963
+  [ditto] done in 9755.8s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.44% | F1=96.38% | MCC=0.953 | ECE=0.0549 | Brier=0.0674
+  [Hospital_B (Breast Ultrasound)] Acc=86.32% | F1=85.35% | MCC=0.766 | ECE=0.0607 | Brier=0.2077
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.06% | F1=96.79% | MCC=0.940 | ECE=0.0563 | Brier=0.0687
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=84.99% | F1=77.89% | MCC=0.733 | ECE=0.0351 | Brier=0.2398
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=63.25% | F1=53.92% | MCC=0.485 | ECE=0.2071 | Brier=0.5890
+  [local_only] done in 8811.4s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.69% | F1=95.60% | MCC=0.944 | ECE=0.0708 | Brier=0.0735
+  [Hospital_B (Breast Ultrasound)] Acc=85.47% | F1=83.31% | MCC=0.755 | ECE=0.1098 | Brier=0.2289
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.65% | F1=96.08% | MCC=0.934 | ECE=0.0670 | Brier=0.0749
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=83.29% | F1=71.01% | MCC=0.701 | ECE=0.0501 | Brier=0.2503
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=60.25% | F1=48.32% | MCC=0.452 | ECE=0.1270 | Brier=0.5430
+  [fedua] done in 10020.4s
+  [fedua] calibration/conformal done
+  [ood_eval] brisc2025: n=1000 acc=98.80% (in-distribution calib threshold, no recalibration)
+  [ood_eval] pmram: n=1505 acc=97.28% (in-distribution calib threshold, no recalibration)
+
+========== SEED 1 ==========
+agg_weights (uniform): {0: 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.19% | F1=96.13% | MCC=0.950 | ECE=0.0694 | Brier=0.0647
+  [Hospital_B (Breast Ultrasound)] Acc=86.32% | F1=85.11% | MCC=0.781 | ECE=0.0967 | Brier=0.1747
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.65% | F1=94.79% | MCC=0.918 | ECE=0.0585 | Brier=0.0902
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=83.39% | F1=73.63% | MCC=0.706 | ECE=0.0532 | Brier=0.2505
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=58.75% | F1=52.72% | MCC=0.430 | ECE=0.1293 | Brier=0.5633
+  [fedbn] done in 8869.3s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.74% | MCC=0.945 | ECE=0.0638 | Brier=0.0703
+  [Hospital_B (Breast Ultrasound)] Acc=83.76% | F1=82.54% | MCC=0.749 | ECE=0.1096 | Brier=0.1824
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.43% | F1=94.52% | MCC=0.915 | ECE=0.0660 | Brier=0.0894
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=84.34% | F1=75.47% | MCC=0.722 | ECE=0.0541 | Brier=0.2376
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=56.75% | F1=50.43% | MCC=0.405 | ECE=0.1343 | Brier=0.5752
+  [fedprox] done in 9718.4s
+  [fedprox] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.25% | F1=96.20% | MCC=0.951 | ECE=0.0609 | Brier=0.0643
+  [Hospital_B (Breast Ultrasound)] Acc=90.60% | F1=89.37% | MCC=0.842 | ECE=0.0680 | Brier=0.1573
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.12% | F1=95.38% | MCC=0.926 | ECE=0.0633 | Brier=0.0802
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=85.49% | F1=76.77% | MCC=0.739 | ECE=0.0348 | Brier=0.2270
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=60.25% | F1=53.34% | MCC=0.447 | ECE=0.1914 | Brier=0.5996
+  [ditto] done in 9823.2s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.06% | F1=96.01% | MCC=0.949 | ECE=0.0491 | Brier=0.0722
+  [Hospital_B (Breast Ultrasound)] Acc=91.45% | F1=90.18% | MCC=0.860 | ECE=0.0243 | Brier=0.1511
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.46% | F1=96.04% | MCC=0.931 | ECE=0.0541 | Brier=0.0782
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=86.83% | F1=80.08% | MCC=0.761 | ECE=0.0560 | Brier=0.2109
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=65.25% | F1=58.62% | MCC=0.516 | ECE=0.1801 | Brier=0.5630
+  [local_only] done in 8847.3s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.06% | F1=96.00% | MCC=0.948 | ECE=0.0612 | Brier=0.0709
+  [Hospital_B (Breast Ultrasound)] Acc=86.32% | F1=84.09% | MCC=0.776 | ECE=0.0930 | Brier=0.1833
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.74% | F1=94.91% | MCC=0.920 | ECE=0.0559 | Brier=0.0879
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.00% | F1=74.65% | MCC=0.698 | ECE=0.0331 | Brier=0.2589
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=54.75% | F1=50.37% | MCC=0.413 | ECE=0.1627 | Brier=0.6229
+  [fedua] done in 9988.6s
+  [fedua] calibration/conformal done
+  [ood_eval] brisc2025: n=1000 acc=98.80% (in-distribution calib threshold, no recalibration)
+  [ood_eval] pmram: n=1505 acc=98.60% (in-distribution calib threshold, no recalibration)
+
+========== SEED 2 ==========
+agg_weights (uniform): {0: 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.76% | MCC=0.945 | ECE=0.0694 | Brier=0.0712
+  [Hospital_B (Breast Ultrasound)] Acc=82.05% | F1=80.73% | MCC=0.720 | ECE=0.0668 | Brier=0.2560
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.52% | F1=95.28% | MCC=0.917 | ECE=0.0622 | Brier=0.0910
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.29% | F1=74.59% | MCC=0.693 | ECE=0.0408 | Brier=0.2580
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=56.25% | F1=49.18% | MCC=0.401 | ECE=0.1003 | Brier=0.5476
+  [fedbn] done in 8751.1s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.12% | F1=96.08% | MCC=0.949 | ECE=0.0711 | Brier=0.0676
+  [Hospital_B (Breast Ultrasound)] Acc=82.91% | F1=81.66% | MCC=0.725 | ECE=0.0804 | Brier=0.2328
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.49% | F1=95.14% | MCC=0.916 | ECE=0.0646 | Brier=0.0886
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.59% | F1=72.91% | MCC=0.693 | ECE=0.0462 | Brier=0.2583
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=61.00% | F1=51.99% | MCC=0.456 | ECE=0.0680 | Brier=0.5279
+  [fedprox] done in 9628.4s
+  [fedprox] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.95% | MCC=0.948 | ECE=0.0631 | Brier=0.0690
+  [Hospital_B (Breast Ultrasound)] Acc=89.74% | F1=88.88% | MCC=0.832 | ECE=0.0511 | Brier=0.1768
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.39% | F1=95.11% | MCC=0.915 | ECE=0.0621 | Brier=0.0852
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=86.73% | F1=80.57% | MCC=0.757 | ECE=0.0417 | Brier=0.2066
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=59.75% | F1=53.59% | MCC=0.442 | ECE=0.1879 | Brier=0.5910
+  [ditto] done in 9774.2s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.69% | F1=95.60% | MCC=0.944 | ECE=0.0472 | Brier=0.0806
+  [Hospital_B (Breast Ultrasound)] Acc=92.31% | F1=91.82% | MCC=0.874 | ECE=0.0311 | Brier=0.1293
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.62% | F1=96.34% | MCC=0.933 | ECE=0.0450 | Brier=0.0785
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=87.38% | F1=78.44% | MCC=0.770 | ECE=0.0313 | Brier=0.2109
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=62.75% | F1=54.83% | MCC=0.485 | ECE=0.2022 | Brier=0.5922
+  [local_only] done in 8710.5s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.75% | F1=95.68% | MCC=0.944 | ECE=0.0699 | Brier=0.0729
+  [Hospital_B (Breast Ultrasound)] Acc=88.03% | F1=87.33% | MCC=0.807 | ECE=0.0700 | Brier=0.1837
+  [Hospital_C (COVID-19 X-Ray)] Acc=93.23% | F1=93.95% | MCC=0.898 | ECE=0.0578 | Brier=0.1094
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.00% | F1=74.56% | MCC=0.687 | ECE=0.0335 | Brier=0.2669
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=61.50% | F1=53.04% | MCC=0.458 | ECE=0.1171 | Brier=0.5216
+  [fedua] done in 10136.1s
+  [fedua] calibration/conformal done
+  [ood_eval] brisc2025: n=1000 acc=98.60% (in-distribution calib threshold, no recalibration)
+  [ood_eval] pmram: n=1505 acc=98.41% (in-distribution calib threshold, no recalibration)
+
+========== SEED 3 ==========
+agg_weights (uniform): {0: 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.74% | MCC=0.945 | ECE=0.0674 | Brier=0.0727
+  [Hospital_B (Breast Ultrasound)] Acc=90.60% | F1=90.22% | MCC=0.842 | ECE=0.0799 | Brier=0.1607
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.62% | F1=96.19% | MCC=0.933 | ECE=0.0656 | Brier=0.0754
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.29% | F1=71.64% | MCC=0.683 | ECE=0.0488 | Brier=0.2565
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=59.75% | F1=52.12% | MCC=0.448 | ECE=0.1235 | Brier=0.5600
+  [fedbn] done in 9908.5s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.38% | F1=95.30% | MCC=0.939 | ECE=0.0708 | Brier=0.0795
+  [Hospital_B (Breast Ultrasound)] Acc=88.03% | F1=86.65% | MCC=0.800 | ECE=0.0758 | Brier=0.1840
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.78% | F1=96.30% | MCC=0.935 | ECE=0.0663 | Brier=0.0727
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.14% | F1=71.16% | MCC=0.683 | ECE=0.0407 | Brier=0.2586
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=58.00% | F1=50.26% | MCC=0.428 | ECE=0.1130 | Brier=0.5698
+  [fedprox] done in 11079.9s
+  [fedprox] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.38% | F1=95.30% | MCC=0.939 | ECE=0.0575 | Brier=0.0781
+  [Hospital_B (Breast Ultrasound)] Acc=86.32% | F1=84.50% | MCC=0.767 | ECE=0.0730 | Brier=0.1858
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.78% | F1=96.49% | MCC=0.935 | ECE=0.0659 | Brier=0.0700
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=85.74% | F1=79.06% | MCC=0.740 | ECE=0.0437 | Brier=0.2148
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=59.25% | F1=51.28% | MCC=0.427 | ECE=0.1990 | Brier=0.6040
+  [ditto] done in 11326.5s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.94% | F1=95.86% | MCC=0.947 | ECE=0.0529 | Brier=0.0762
+  [Hospital_B (Breast Ultrasound)] Acc=88.89% | F1=88.13% | MCC=0.814 | ECE=0.0539 | Brier=0.1852
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.16% | F1=96.96% | MCC=0.941 | ECE=0.0622 | Brier=0.0667
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=85.29% | F1=78.30% | MCC=0.738 | ECE=0.0346 | Brier=0.2370
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=59.00% | F1=50.55% | MCC=0.430 | ECE=0.2398 | Brier=0.6464
+  [local_only] done in 9810.5s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.31% | F1=95.24% | MCC=0.938 | ECE=0.0645 | Brier=0.0843
+  [Hospital_B (Breast Ultrasound)] Acc=90.60% | F1=89.87% | MCC=0.845 | ECE=0.0609 | Brier=0.1416
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.24% | F1=95.70% | MCC=0.928 | ECE=0.0595 | Brier=0.0812
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.64% | F1=74.69% | MCC=0.701 | ECE=0.0368 | Brier=0.2621
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=58.75% | F1=51.69% | MCC=0.436 | ECE=0.1198 | Brier=0.5653
+  [fedua] done in 11250.6s
+  [fedua] calibration/conformal done
+  [ood_eval] brisc2025: n=1000 acc=98.30% (in-distribution calib threshold, no recalibration)
+  [ood_eval] pmram: n=1505 acc=98.41% (in-distribution calib threshold, no recalibration)
+
+========== SEED 4 ==========
+agg_weights (uniform): {0: 0.2, 1: 0.2, 2: 0.2, 3: 0.2, 4: 0.2}
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.69% | F1=95.61% | MCC=0.944 | ECE=0.0687 | Brier=0.0731
+  [Hospital_B (Breast Ultrasound)] Acc=93.16% | F1=92.74% | MCC=0.887 | ECE=0.0963 | Brier=0.1282
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.87% | F1=95.01% | MCC=0.922 | ECE=0.0711 | Brier=0.0816
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.14% | F1=72.92% | MCC=0.689 | ECE=0.0326 | Brier=0.2615
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=60.75% | F1=56.38% | MCC=0.460 | ECE=0.1064 | Brier=0.5617
+  [fedbn] done in 9895.6s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.74% | MCC=0.945 | ECE=0.0722 | Brier=0.0714
+  [Hospital_B (Breast Ultrasound)] Acc=92.31% | F1=91.90% | MCC=0.873 | ECE=0.1021 | Brier=0.1368
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.06% | F1=95.10% | MCC=0.925 | ECE=0.0636 | Brier=0.0807
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=82.14% | F1=73.34% | MCC=0.685 | ECE=0.0355 | Brier=0.2613
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=58.00% | F1=53.29% | MCC=0.420 | ECE=0.0973 | Brier=0.5551
+  [fedprox] done in 11228.2s
+  [fedprox] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.06% | F1=96.00% | MCC=0.948 | ECE=0.0622 | Brier=0.0686
+  [Hospital_B (Breast Ultrasound)] Acc=93.16% | F1=92.24% | MCC=0.883 | ECE=0.0382 | Brier=0.1247
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.31% | F1=95.50% | MCC=0.928 | ECE=0.0608 | Brier=0.0775
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=86.88% | F1=79.61% | MCC=0.761 | ECE=0.0394 | Brier=0.2128
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=57.75% | F1=52.45% | MCC=0.429 | ECE=0.2197 | Brier=0.6219
+  [ditto] done in 11068.7s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.94% | F1=95.86% | MCC=0.947 | ECE=0.0512 | Brier=0.0751
+  [Hospital_B (Breast Ultrasound)] Acc=94.87% | F1=94.94% | MCC=0.912 | ECE=0.0665 | Brier=0.1041
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.53% | F1=96.03% | MCC=0.932 | ECE=0.0548 | Brier=0.0784
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=86.28% | F1=76.73% | MCC=0.754 | ECE=0.0473 | Brier=0.2141
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=61.75% | F1=50.42% | MCC=0.451 | ECE=0.2086 | Brier=0.5765
+  [local_only] done in 9778.8s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.93% | MCC=0.948 | ECE=0.0580 | Brier=0.0729
+  [Hospital_B (Breast Ultrasound)] Acc=92.31% | F1=91.96% | MCC=0.874 | ECE=0.0758 | Brier=0.1281
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.18% | F1=95.50% | MCC=0.926 | ECE=0.0599 | Brier=0.0785
+  [Hospital_D (Dermatology, DermaMNIST)] Acc=83.79% | F1=73.94% | MCC=0.710 | ECE=0.0302 | Brier=0.2534
+  [Hospital_E (Retina/DR Grading, RetinaMNIST)] Acc=60.00% | F1=50.98% | MCC=0.441 | ECE=0.1210 | Brier=0.5550
+  [fedua] done in 11217.2s
+  [fedua] calibration/conformal done
+  [ood_eval] brisc2025: n=1000 acc=98.60% (in-distribution calib threshold, no recalibration)
+  [ood_eval] pmram: n=1505 acc=98.94% (in-distribution calib threshold, no recalibration)
+
+[OK] raw results -> outputs_journal_5client_v2\raw

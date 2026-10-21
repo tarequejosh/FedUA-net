@@ -1,0 +1,145 @@
+PyTorch 2.11.0+cu128 | device=cuda | Attention=cbam
+GPU=NVIDIA GeForce RTX 5060  free VRAM 6.9GB
+
+========== SEED 0 ==========
+agg_weights (uniform): {0: 0.333, 1: 0.333, 2: 0.333}
+[fedavg] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.73% | MCC=0.945 | ECE=0.0590 | Brier=0.0733
+  [Hospital_B (Breast Ultrasound)] Acc=82.91% | F1=80.91% | MCC=0.705 | ECE=0.0991 | Brier=0.2307
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.16% | F1=96.76% | MCC=0.941 | ECE=0.0616 | Brier=0.0641
+  [fedavg] done in 5062.3s
+  [fedavg] calibration/conformal done
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.19% | F1=96.12% | MCC=0.950 | ECE=0.0574 | Brier=0.0678
+  [Hospital_B (Breast Ultrasound)] Acc=86.32% | F1=84.79% | MCC=0.770 | ECE=0.0865 | Brier=0.2345
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.35% | F1=96.90% | MCC=0.944 | ECE=0.0607 | Brier=0.0642
+  [fedbn] done in 5107.2s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.74% | MCC=0.945 | ECE=0.0574 | Brier=0.0741
+  [Hospital_B (Breast Ultrasound)] Acc=85.47% | F1=84.43% | MCC=0.760 | ECE=0.0716 | Brier=0.2279
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.16% | F1=96.73% | MCC=0.941 | ECE=0.0620 | Brier=0.0660
+  [fedprox] done in 5443.1s
+  [fedprox] calibration/conformal done
+[fedbabu] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.93% | MCC=0.948 | ECE=0.0634 | Brier=0.0713
+  [Hospital_B (Breast Ultrasound)] Acc=85.47% | F1=83.75% | MCC=0.757 | ECE=0.0909 | Brier=0.2208
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.22% | F1=96.75% | MCC=0.942 | ECE=0.0621 | Brier=0.0660
+  [fedbabu] done in 5415.6s
+  [fedbabu] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.94% | F1=95.86% | MCC=0.947 | ECE=0.0564 | Brier=0.0715
+  [Hospital_B (Breast Ultrasound)] Acc=84.62% | F1=82.98% | MCC=0.739 | ECE=0.0619 | Brier=0.2247
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.78% | F1=96.32% | MCC=0.936 | ECE=0.0589 | Brier=0.0720
+  [ditto] done in 5439.3s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=95.81% | F1=95.74% | MCC=0.945 | ECE=0.0479 | Brier=0.0764
+  [Hospital_B (Breast Ultrasound)] Acc=88.89% | F1=88.18% | MCC=0.813 | ECE=0.0450 | Brier=0.1747
+  [Hospital_C (COVID-19 X-Ray)] Acc=96.35% | F1=96.86% | MCC=0.944 | ECE=0.0570 | Brier=0.0645
+  [local_only] done in 4909.3s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.19% | F1=96.14% | MCC=0.950 | ECE=0.0579 | Brier=0.0657
+  [Hospital_B (Breast Ultrasound)] Acc=84.62% | F1=84.10% | MCC=0.742 | ECE=0.0523 | Brier=0.2273
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.09% | F1=95.84% | MCC=0.926 | ECE=0.0536 | Brier=0.0813
+  [fedua] done in 5905.8s
+  [fedua] calibration/conformal done
+[centralized] training on pooled data ...
+  [centralized] done in 1346.0s
+
+========== SEED 1 ==========
+agg_weights (uniform): {0: 0.333, 1: 0.333, 2: 0.333}
+[fedavg] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.94% | MCC=0.948 | ECE=0.0654 | Brier=0.0698
+  [Hospital_B (Breast Ultrasound)] Acc=87.18% | F1=85.67% | MCC=0.785 | ECE=0.0671 | Brier=0.1850
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.12% | F1=95.45% | MCC=0.925 | ECE=0.0618 | Brier=0.0821
+  [fedavg] done in 4973.2s
+  [fedavg] calibration/conformal done
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.56% | F1=96.51% | MCC=0.955 | ECE=0.0663 | Brier=0.0631
+  [Hospital_B (Breast Ultrasound)] Acc=88.89% | F1=87.22% | MCC=0.816 | ECE=0.0644 | Brier=0.1508
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.50% | F1=95.68% | MCC=0.931 | ECE=0.0593 | Brier=0.0776
+  [fedbn] done in 4977.7s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.93% | MCC=0.948 | ECE=0.0615 | Brier=0.0668
+  [Hospital_B (Breast Ultrasound)] Acc=92.31% | F1=92.04% | MCC=0.878 | ECE=0.0794 | Brier=0.1175
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.43% | F1=95.82% | MCC=0.930 | ECE=0.0591 | Brier=0.0788
+  [fedprox] done in 5427.6s
+  [fedprox] calibration/conformal done
+[fedbabu] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.25% | F1=96.20% | MCC=0.951 | ECE=0.0623 | Brier=0.0686
+  [Hospital_B (Breast Ultrasound)] Acc=85.47% | F1=84.21% | MCC=0.765 | ECE=0.1027 | Brier=0.1735
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.21% | F1=95.46% | MCC=0.927 | ECE=0.0625 | Brier=0.0825
+  [fedbabu] done in 5549.5s
+  [fedbabu] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.25% | F1=96.20% | MCC=0.951 | ECE=0.0591 | Brier=0.0656
+  [Hospital_B (Breast Ultrasound)] Acc=91.45% | F1=89.92% | MCC=0.855 | ECE=0.0437 | Brier=0.1362
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.50% | F1=95.80% | MCC=0.931 | ECE=0.0611 | Brier=0.0775
+  [ditto] done in 5583.0s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.12% | F1=96.05% | MCC=0.950 | ECE=0.0521 | Brier=0.0732
+  [Hospital_B (Breast Ultrasound)] Acc=88.89% | F1=87.96% | MCC=0.819 | ECE=0.0410 | Brier=0.1771
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.62% | F1=96.04% | MCC=0.933 | ECE=0.0508 | Brier=0.0804
+  [local_only] done in 4890.3s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.69% | F1=96.65% | MCC=0.956 | ECE=0.0636 | Brier=0.0611
+  [Hospital_B (Breast Ultrasound)] Acc=89.74% | F1=88.43% | MCC=0.831 | ECE=0.0416 | Brier=0.1693
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.40% | F1=95.80% | MCC=0.930 | ECE=0.0661 | Brier=0.0793
+  [fedua] done in 5866.6s
+  [fedua] calibration/conformal done
+[centralized] training on pooled data ...
+  [centralized] done in 1317.0s
+
+========== SEED 2 ==========
+agg_weights (uniform): {0: 0.333, 1: 0.333, 2: 0.333}
+[fedavg] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.44% | F1=96.39% | MCC=0.953 | ECE=0.0626 | Brier=0.0620
+  [Hospital_B (Breast Ultrasound)] Acc=87.18% | F1=86.12% | MCC=0.777 | ECE=0.0575 | Brier=0.1962
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.17% | F1=94.80% | MCC=0.912 | ECE=0.0601 | Brier=0.0915
+  [fedavg] done in 4950.6s
+  [fedavg] calibration/conformal done
+[fedbn] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.25% | F1=96.19% | MCC=0.951 | ECE=0.0638 | Brier=0.0679
+  [Hospital_B (Breast Ultrasound)] Acc=87.18% | F1=86.27% | MCC=0.783 | ECE=0.0991 | Brier=0.1787
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.87% | F1=95.43% | MCC=0.922 | ECE=0.0612 | Brier=0.0836
+  [fedbn] done in 4923.2s
+  [fedbn] calibration/conformal done
+[fedprox] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.25% | F1=96.19% | MCC=0.951 | ECE=0.0649 | Brier=0.0649
+  [Hospital_B (Breast Ultrasound)] Acc=87.18% | F1=86.17% | MCC=0.786 | ECE=0.0759 | Brier=0.1806
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.46% | F1=95.09% | MCC=0.916 | ECE=0.0588 | Brier=0.0866
+  [fedprox] done in 5617.5s
+  [fedprox] calibration/conformal done
+[fedbabu] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.95% | MCC=0.948 | ECE=0.0670 | Brier=0.0690
+  [Hospital_B (Breast Ultrasound)] Acc=82.91% | F1=80.71% | MCC=0.723 | ECE=0.0934 | Brier=0.2233
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.55% | F1=95.33% | MCC=0.917 | ECE=0.0610 | Brier=0.0886
+  [fedbabu] done in 5365.6s
+  [fedbabu] calibration/conformal done
+[ditto] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.56% | F1=96.52% | MCC=0.955 | ECE=0.0644 | Brier=0.0638
+  [Hospital_B (Breast Ultrasound)] Acc=94.02% | F1=93.79% | MCC=0.905 | ECE=0.0606 | Brier=0.1062
+  [Hospital_C (COVID-19 X-Ray)] Acc=94.93% | F1=95.61% | MCC=0.923 | ECE=0.0586 | Brier=0.0833
+  [ditto] done in 5462.5s
+  [ditto] calibration/conformal done
+[local_only] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.12% | F1=96.06% | MCC=0.949 | ECE=0.0530 | Brier=0.0691
+  [Hospital_B (Breast Ultrasound)] Acc=93.16% | F1=92.53% | MCC=0.884 | ECE=0.0398 | Brier=0.1197
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.34% | F1=96.15% | MCC=0.929 | ECE=0.0557 | Brier=0.0804
+  [local_only] done in 4854.4s
+  [local_only] calibration/conformal done
+[fedua] training ...
+  [Hospital_A (Brain-Tumor MRI)] Acc=96.00% | F1=95.94% | MCC=0.948 | ECE=0.0590 | Brier=0.0677
+  [Hospital_B (Breast Ultrasound)] Acc=89.74% | F1=89.61% | MCC=0.832 | ECE=0.0701 | Brier=0.1825
+  [Hospital_C (COVID-19 X-Ray)] Acc=95.06% | F1=95.43% | MCC=0.924 | ECE=0.0545 | Brier=0.0826
+  [fedua] done in 5839.6s
+  [fedua] calibration/conformal done
+[centralized] training on pooled data ...
+  [centralized] done in 1304.8s
+
+[OK] raw results -> outputs_journal_3client_v2\raw

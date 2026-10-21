@@ -236,14 +236,15 @@ def main():
             fed_te = {(p, s): [] for p in PROTOCOLS for s in SCORES}
             for c in cids:
                 ck = ckpts / f'{name}_seed{seed}_client{c}.pt'
-                if not ck.exists():
-                    print(f'[WARN] missing checkpoint {ck}'); continue
+                cache = cache_dir / f'{name}_seed{seed}_client{c}.npz'
+                if not ck.exists() and not cache.exists():
+                    print(f'[WARN] no checkpoint or cached logits for {ck.stem}'); continue
                 def net_fn(c=c, ck=ck):
                     net = ex.new_client_net(ncls[c], seed)
                     net.load_state_dict(torch.load(ck, map_location=ex.DEV)); net.eval()
                     return net
                 want_ood = ood if (c == 0 and name in args.ood_strategies) else {}
-                L = get_logits(cache_dir / f'{name}_seed{seed}_client{c}.npz', net_fn, loaders[c], want_ood)
+                L = get_logits(cache, net_fn, loaders[c], want_ood)
 
                 for proto in PROTOCOLS:
                     k = keep[proto][c]

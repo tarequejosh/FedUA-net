@@ -1,0 +1,852 @@
+{
+  "seed0|Hospital_A (Brain-Tumor MRI)|temp": {
+    "n": 210,
+    "n_dup": 45,
+    "frac_dup": 0.21428571428571427,
+    "n_exact_hash": 15,
+    "threshold_bits": 10,
+    "audited_pairs": 45,
+    "pixel_corr_min": 0.9770219841786871,
+    "pixel_corr_median": 0.9999133815973753
+  },
+  "seed0|Hospital_A (Brain-Tumor MRI)|conf": {
+    "n": 210,
+    "n_dup": 37,
+    "frac_dup": 0.1761904761904762,
+    "n_exact_hash": 12,
+    "threshold_bits": 10,
+    "audited_pairs": 37,
+    "pixel_corr_min": 0.969384604760962,
+    "pixel_corr_median": 0.9998325847138236
+  },
+  "seed0|Hospital_A (Brain-Tumor MRI)|test": {
+    "n": 1600,
+    "n_dup": 430,
+    "frac_dup": 0.26875,
+    "n_exact_hash": 141,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.949398571600378,
+    "pixel_corr_median": 0.9998723630456798
+  },
+  "seed0|Hospital_B (Breast Ultrasound)|temp": {
+    "n": 29,
+    "n_dup": 1,
+    "frac_dup": 0.034482758620689655,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9971776438399907,
+    "pixel_corr_median": 0.9971776438399907
+  },
+  "seed0|Hospital_B (Breast Ultrasound)|conf": {
+    "n": 30,
+    "n_dup": 2,
+    "frac_dup": 0.06666666666666667,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.9960917289428783,
+    "pixel_corr_median": 0.996371036345399
+  },
+  "seed0|Hospital_B (Breast Ultrasound)|test": {
+    "n": 117,
+    "n_dup": 14,
+    "frac_dup": 0.11965811965811966,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 14,
+    "pixel_corr_min": 0.9730647763238658,
+    "pixel_corr_median": 0.9933170634574368
+  },
+  "seed0|Hospital_C (COVID-19 X-Ray)|temp": {
+    "n": 794,
+    "n_dup": 14,
+    "frac_dup": 0.017632241813602016,
+    "n_exact_hash": 5,
+    "threshold_bits": 10,
+    "audited_pairs": 14,
+    "pixel_corr_min": 0.7988194803230155,
+    "pixel_corr_median": 0.9998931730440945
+  },
+  "seed0|Hospital_C (COVID-19 X-Ray)|conf": {
+    "n": 794,
+    "n_dup": 15,
+    "frac_dup": 0.018891687657430732,
+    "n_exact_hash": 6,
+    "threshold_bits": 10,
+    "audited_pairs": 15,
+    "pixel_corr_min": 0.9928293264216852,
+    "pixel_corr_median": 0.9999198536598282
+  },
+  "seed0|Hospital_C (COVID-19 X-Ray)|test": {
+    "n": 3175,
+    "n_dup": 68,
+    "frac_dup": 0.021417322834645668,
+    "n_exact_hash": 25,
+    "threshold_bits": 10,
+    "audited_pairs": 68,
+    "pixel_corr_min": 0.8056829987052492,
+    "pixel_corr_median": 0.9999277587470832
+  },
+  "seed0|Hospital_D (Dermatology, DermaMNIST)|temp": {
+    "n": 251,
+    "n_dup": 1,
+    "frac_dup": 0.00398406374501992,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9970142858154193,
+    "pixel_corr_median": 0.9970142858154193
+  },
+  "seed0|Hospital_D (Dermatology, DermaMNIST)|conf": {
+    "n": 251,
+    "n_dup": 0,
+    "frac_dup": 0.0,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 0,
+    "pixel_corr_min": null,
+    "pixel_corr_median": null
+  },
+  "seed0|Hospital_D (Dermatology, DermaMNIST)|test": {
+    "n": 2005,
+    "n_dup": 3,
+    "frac_dup": 0.0014962593516209476,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9974261471268759,
+    "pixel_corr_median": 0.9979928262393327
+  },
+  "seed0|Hospital_E (Retina/DR Grading, RetinaMNIST)|temp": {
+    "n": 30,
+    "n_dup": 2,
+    "frac_dup": 0.06666666666666667,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.8776854427155506,
+    "pixel_corr_median": 0.9271127297082438
+  },
+  "seed0|Hospital_E (Retina/DR Grading, RetinaMNIST)|conf": {
+    "n": 30,
+    "n_dup": 1,
+    "frac_dup": 0.03333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.979496263045295,
+    "pixel_corr_median": 0.979496263045295
+  },
+  "seed0|Hospital_E (Retina/DR Grading, RetinaMNIST)|test": {
+    "n": 400,
+    "n_dup": 63,
+    "frac_dup": 0.1575,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 63,
+    "pixel_corr_min": 0.7965386950094604,
+    "pixel_corr_median": 0.9703491854175498
+  },
+  "seed0|ood_brisc2025|vs_hospitalA_all": {
+    "n": 1000,
+    "n_dup": 857,
+    "frac_dup": 0.857,
+    "n_exact_hash": 857,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9999245958052085,
+    "pixel_corr_median": 0.9999999999479222
+  },
+  "seed0|ood_pmram|vs_hospitalA_all": {
+    "n": 1505,
+    "n_dup": 849,
+    "frac_dup": 0.5641196013289037,
+    "n_exact_hash": 507,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9811878191814218,
+    "pixel_corr_median": 0.9999796446556233
+  },
+  "seed1|Hospital_A (Brain-Tumor MRI)|temp": {
+    "n": 210,
+    "n_dup": 44,
+    "frac_dup": 0.20952380952380953,
+    "n_exact_hash": 17,
+    "threshold_bits": 10,
+    "audited_pairs": 44,
+    "pixel_corr_min": 0.9496057494230727,
+    "pixel_corr_median": 0.9998924038179996
+  },
+  "seed1|Hospital_A (Brain-Tumor MRI)|conf": {
+    "n": 210,
+    "n_dup": 38,
+    "frac_dup": 0.18095238095238095,
+    "n_exact_hash": 10,
+    "threshold_bits": 10,
+    "audited_pairs": 38,
+    "pixel_corr_min": 0.9761474103273671,
+    "pixel_corr_median": 0.9998604085161087
+  },
+  "seed1|Hospital_A (Brain-Tumor MRI)|test": {
+    "n": 1600,
+    "n_dup": 422,
+    "frac_dup": 0.26375,
+    "n_exact_hash": 139,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9320163774664861,
+    "pixel_corr_median": 0.9998721832370593
+  },
+  "seed1|Hospital_B (Breast Ultrasound)|temp": {
+    "n": 29,
+    "n_dup": 5,
+    "frac_dup": 0.1724137931034483,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 5,
+    "pixel_corr_min": 0.9783207726655351,
+    "pixel_corr_median": 0.9919948481090224
+  },
+  "seed1|Hospital_B (Breast Ultrasound)|conf": {
+    "n": 30,
+    "n_dup": 2,
+    "frac_dup": 0.06666666666666667,
+    "n_exact_hash": 1,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.9975619350553555,
+    "pixel_corr_median": 0.9987809675093933
+  },
+  "seed1|Hospital_B (Breast Ultrasound)|test": {
+    "n": 117,
+    "n_dup": 6,
+    "frac_dup": 0.05128205128205128,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 6,
+    "pixel_corr_min": 0.9895245655341754,
+    "pixel_corr_median": 0.9960007806837434
+  },
+  "seed1|Hospital_C (COVID-19 X-Ray)|temp": {
+    "n": 794,
+    "n_dup": 19,
+    "frac_dup": 0.02392947103274559,
+    "n_exact_hash": 6,
+    "threshold_bits": 10,
+    "audited_pairs": 19,
+    "pixel_corr_min": 0.8056829987052492,
+    "pixel_corr_median": 0.9998892202146876
+  },
+  "seed1|Hospital_C (COVID-19 X-Ray)|conf": {
+    "n": 794,
+    "n_dup": 14,
+    "frac_dup": 0.017632241813602016,
+    "n_exact_hash": 7,
+    "threshold_bits": 10,
+    "audited_pairs": 14,
+    "pixel_corr_min": 0.8104324797810376,
+    "pixel_corr_median": 0.9999408842783352
+  },
+  "seed1|Hospital_C (COVID-19 X-Ray)|test": {
+    "n": 3175,
+    "n_dup": 60,
+    "frac_dup": 0.01889763779527559,
+    "n_exact_hash": 20,
+    "threshold_bits": 10,
+    "audited_pairs": 60,
+    "pixel_corr_min": 0.7945475775785331,
+    "pixel_corr_median": 0.9999321264752687
+  },
+  "seed1|Hospital_D (Dermatology, DermaMNIST)|temp": {
+    "n": 251,
+    "n_dup": 2,
+    "frac_dup": 0.00796812749003984,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.9957984310545369,
+    "pixel_corr_median": 0.996406358434978
+  },
+  "seed1|Hospital_D (Dermatology, DermaMNIST)|conf": {
+    "n": 251,
+    "n_dup": 0,
+    "frac_dup": 0.0,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 0,
+    "pixel_corr_min": null,
+    "pixel_corr_median": null
+  },
+  "seed1|Hospital_D (Dermatology, DermaMNIST)|test": {
+    "n": 2005,
+    "n_dup": 3,
+    "frac_dup": 0.0014962593516209476,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9974261471268759,
+    "pixel_corr_median": 0.9979928262393327
+  },
+  "seed1|Hospital_E (Retina/DR Grading, RetinaMNIST)|temp": {
+    "n": 30,
+    "n_dup": 4,
+    "frac_dup": 0.13333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 4,
+    "pixel_corr_min": 0.8776854427155506,
+    "pixel_corr_median": 0.9357523854885108
+  },
+  "seed1|Hospital_E (Retina/DR Grading, RetinaMNIST)|conf": {
+    "n": 30,
+    "n_dup": 1,
+    "frac_dup": 0.03333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.983234710472845,
+    "pixel_corr_median": 0.983234710472845
+  },
+  "seed1|Hospital_E (Retina/DR Grading, RetinaMNIST)|test": {
+    "n": 400,
+    "n_dup": 63,
+    "frac_dup": 0.1575,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 63,
+    "pixel_corr_min": 0.7965386950094604,
+    "pixel_corr_median": 0.9703491854175498
+  },
+  "seed1|ood_brisc2025|vs_hospitalA_all": {
+    "n": 1000,
+    "n_dup": 857,
+    "frac_dup": 0.857,
+    "n_exact_hash": 857,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9999253506055616,
+    "pixel_corr_median": 0.9999999999479222
+  },
+  "seed1|ood_pmram|vs_hospitalA_all": {
+    "n": 1505,
+    "n_dup": 849,
+    "frac_dup": 0.5641196013289037,
+    "n_exact_hash": 507,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9811878191814218,
+    "pixel_corr_median": 0.9999796446556233
+  },
+  "seed2|Hospital_A (Brain-Tumor MRI)|temp": {
+    "n": 210,
+    "n_dup": 43,
+    "frac_dup": 0.20476190476190476,
+    "n_exact_hash": 18,
+    "threshold_bits": 10,
+    "audited_pairs": 43,
+    "pixel_corr_min": 0.98278928483329,
+    "pixel_corr_median": 0.9998291528231238
+  },
+  "seed2|Hospital_A (Brain-Tumor MRI)|conf": {
+    "n": 210,
+    "n_dup": 32,
+    "frac_dup": 0.1523809523809524,
+    "n_exact_hash": 12,
+    "threshold_bits": 10,
+    "audited_pairs": 32,
+    "pixel_corr_min": 0.9900582125048127,
+    "pixel_corr_median": 0.9998833844963556
+  },
+  "seed2|Hospital_A (Brain-Tumor MRI)|test": {
+    "n": 1600,
+    "n_dup": 426,
+    "frac_dup": 0.26625,
+    "n_exact_hash": 138,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9320163774664861,
+    "pixel_corr_median": 0.9998742741612237
+  },
+  "seed2|Hospital_B (Breast Ultrasound)|temp": {
+    "n": 29,
+    "n_dup": 2,
+    "frac_dup": 0.06896551724137931,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.9817557153930813,
+    "pixel_corr_median": 0.988405114626242
+  },
+  "seed2|Hospital_B (Breast Ultrasound)|conf": {
+    "n": 30,
+    "n_dup": 3,
+    "frac_dup": 0.1,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9919948481090224,
+    "pixel_corr_median": 0.9943519872378002
+  },
+  "seed2|Hospital_B (Breast Ultrasound)|test": {
+    "n": 117,
+    "n_dup": 9,
+    "frac_dup": 0.07692307692307693,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 9,
+    "pixel_corr_min": 0.9303599857654756,
+    "pixel_corr_median": 0.9960917289428783
+  },
+  "seed2|Hospital_C (COVID-19 X-Ray)|temp": {
+    "n": 794,
+    "n_dup": 14,
+    "frac_dup": 0.017632241813602016,
+    "n_exact_hash": 8,
+    "threshold_bits": 10,
+    "audited_pairs": 14,
+    "pixel_corr_min": 0.7042544412470002,
+    "pixel_corr_median": 0.9999354292112436
+  },
+  "seed2|Hospital_C (COVID-19 X-Ray)|conf": {
+    "n": 794,
+    "n_dup": 13,
+    "frac_dup": 0.0163727959697733,
+    "n_exact_hash": 8,
+    "threshold_bits": 10,
+    "audited_pairs": 13,
+    "pixel_corr_min": 0.9986694008507375,
+    "pixel_corr_median": 0.9999380411718318
+  },
+  "seed2|Hospital_C (COVID-19 X-Ray)|test": {
+    "n": 3175,
+    "n_dup": 61,
+    "frac_dup": 0.01921259842519685,
+    "n_exact_hash": 20,
+    "threshold_bits": 10,
+    "audited_pairs": 61,
+    "pixel_corr_min": 0.8035390259267434,
+    "pixel_corr_median": 0.9999276655848834
+  },
+  "seed2|Hospital_D (Dermatology, DermaMNIST)|temp": {
+    "n": 251,
+    "n_dup": 0,
+    "frac_dup": 0.0,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 0,
+    "pixel_corr_min": null,
+    "pixel_corr_median": null
+  },
+  "seed2|Hospital_D (Dermatology, DermaMNIST)|conf": {
+    "n": 251,
+    "n_dup": 2,
+    "frac_dup": 0.00796812749003984,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.9957984310545369,
+    "pixel_corr_median": 0.996406358434978
+  },
+  "seed2|Hospital_D (Dermatology, DermaMNIST)|test": {
+    "n": 2005,
+    "n_dup": 3,
+    "frac_dup": 0.0014962593516209476,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9974261471268759,
+    "pixel_corr_median": 0.9979928262393327
+  },
+  "seed2|Hospital_E (Retina/DR Grading, RetinaMNIST)|temp": {
+    "n": 30,
+    "n_dup": 1,
+    "frac_dup": 0.03333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9765400167009369,
+    "pixel_corr_median": 0.9765400167009369
+  },
+  "seed2|Hospital_E (Retina/DR Grading, RetinaMNIST)|conf": {
+    "n": 30,
+    "n_dup": 2,
+    "frac_dup": 0.06666666666666667,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 2,
+    "pixel_corr_min": 0.9547327669078729,
+    "pixel_corr_median": 0.968983738690359
+  },
+  "seed2|Hospital_E (Retina/DR Grading, RetinaMNIST)|test": {
+    "n": 400,
+    "n_dup": 63,
+    "frac_dup": 0.1575,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 63,
+    "pixel_corr_min": 0.7965386950094604,
+    "pixel_corr_median": 0.9703491854175498
+  },
+  "seed2|ood_brisc2025|vs_hospitalA_all": {
+    "n": 1000,
+    "n_dup": 857,
+    "frac_dup": 0.857,
+    "n_exact_hash": 857,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9999999999248657,
+    "pixel_corr_median": 0.999999999948081
+  },
+  "seed2|ood_pmram|vs_hospitalA_all": {
+    "n": 1505,
+    "n_dup": 849,
+    "frac_dup": 0.5641196013289037,
+    "n_exact_hash": 507,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9811878191814218,
+    "pixel_corr_median": 0.9999796446556233
+  },
+  "seed3|Hospital_A (Brain-Tumor MRI)|temp": {
+    "n": 210,
+    "n_dup": 40,
+    "frac_dup": 0.19047619047619047,
+    "n_exact_hash": 13,
+    "threshold_bits": 10,
+    "audited_pairs": 40,
+    "pixel_corr_min": 0.9691773910199033,
+    "pixel_corr_median": 0.999861430792967
+  },
+  "seed3|Hospital_A (Brain-Tumor MRI)|conf": {
+    "n": 210,
+    "n_dup": 38,
+    "frac_dup": 0.18095238095238095,
+    "n_exact_hash": 16,
+    "threshold_bits": 10,
+    "audited_pairs": 38,
+    "pixel_corr_min": 0.9749152104387837,
+    "pixel_corr_median": 0.9998560998428115
+  },
+  "seed3|Hospital_A (Brain-Tumor MRI)|test": {
+    "n": 1600,
+    "n_dup": 432,
+    "frac_dup": 0.27,
+    "n_exact_hash": 140,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9320163774664861,
+    "pixel_corr_median": 0.9998696759749306
+  },
+  "seed3|Hospital_B (Breast Ultrasound)|temp": {
+    "n": 29,
+    "n_dup": 1,
+    "frac_dup": 0.034482758620689655,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9960917289428783,
+    "pixel_corr_median": 0.9960917289428783
+  },
+  "seed3|Hospital_B (Breast Ultrasound)|conf": {
+    "n": 30,
+    "n_dup": 4,
+    "frac_dup": 0.13333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 4,
+    "pixel_corr_min": 0.9908671201734804,
+    "pixel_corr_median": 0.9937685051652744
+  },
+  "seed3|Hospital_B (Breast Ultrasound)|test": {
+    "n": 117,
+    "n_dup": 12,
+    "frac_dup": 0.10256410256410256,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 12,
+    "pixel_corr_min": 0.9303599857654756,
+    "pixel_corr_median": 0.9843705863227934
+  },
+  "seed3|Hospital_C (COVID-19 X-Ray)|temp": {
+    "n": 794,
+    "n_dup": 13,
+    "frac_dup": 0.0163727959697733,
+    "n_exact_hash": 6,
+    "threshold_bits": 10,
+    "audited_pairs": 13,
+    "pixel_corr_min": 0.8948715333685155,
+    "pixel_corr_median": 0.9999287242889394
+  },
+  "seed3|Hospital_C (COVID-19 X-Ray)|conf": {
+    "n": 794,
+    "n_dup": 13,
+    "frac_dup": 0.0163727959697733,
+    "n_exact_hash": 4,
+    "threshold_bits": 10,
+    "audited_pairs": 13,
+    "pixel_corr_min": 0.908049465681126,
+    "pixel_corr_median": 0.9999102872416166
+  },
+  "seed3|Hospital_C (COVID-19 X-Ray)|test": {
+    "n": 3175,
+    "n_dup": 64,
+    "frac_dup": 0.02015748031496063,
+    "n_exact_hash": 18,
+    "threshold_bits": 10,
+    "audited_pairs": 64,
+    "pixel_corr_min": 0.7019972431667084,
+    "pixel_corr_median": 0.9999162190748466
+  },
+  "seed3|Hospital_D (Dermatology, DermaMNIST)|temp": {
+    "n": 251,
+    "n_dup": 1,
+    "frac_dup": 0.00398406374501992,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9970142858154193,
+    "pixel_corr_median": 0.9970142858154193
+  },
+  "seed3|Hospital_D (Dermatology, DermaMNIST)|conf": {
+    "n": 251,
+    "n_dup": 0,
+    "frac_dup": 0.0,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 0,
+    "pixel_corr_min": null,
+    "pixel_corr_median": null
+  },
+  "seed3|Hospital_D (Dermatology, DermaMNIST)|test": {
+    "n": 2005,
+    "n_dup": 3,
+    "frac_dup": 0.0014962593516209476,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9974261471268759,
+    "pixel_corr_median": 0.9979928262393327
+  },
+  "seed3|Hospital_E (Retina/DR Grading, RetinaMNIST)|temp": {
+    "n": 30,
+    "n_dup": 1,
+    "frac_dup": 0.03333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9765400167009369,
+    "pixel_corr_median": 0.9765400167009369
+  },
+  "seed3|Hospital_E (Retina/DR Grading, RetinaMNIST)|conf": {
+    "n": 30,
+    "n_dup": 1,
+    "frac_dup": 0.03333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.8776854427155506,
+    "pixel_corr_median": 0.8776854427155506
+  },
+  "seed3|Hospital_E (Retina/DR Grading, RetinaMNIST)|test": {
+    "n": 400,
+    "n_dup": 63,
+    "frac_dup": 0.1575,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 63,
+    "pixel_corr_min": 0.7965386950094604,
+    "pixel_corr_median": 0.9703491854175498
+  },
+  "seed3|ood_brisc2025|vs_hospitalA_all": {
+    "n": 1000,
+    "n_dup": 857,
+    "frac_dup": 0.857,
+    "n_exact_hash": 857,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9999253506055616,
+    "pixel_corr_median": 0.9999999999479222
+  },
+  "seed3|ood_pmram|vs_hospitalA_all": {
+    "n": 1505,
+    "n_dup": 849,
+    "frac_dup": 0.5641196013289037,
+    "n_exact_hash": 507,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9811878191814218,
+    "pixel_corr_median": 0.9999796446556233
+  },
+  "seed4|Hospital_A (Brain-Tumor MRI)|temp": {
+    "n": 210,
+    "n_dup": 37,
+    "frac_dup": 0.1761904761904762,
+    "n_exact_hash": 17,
+    "threshold_bits": 10,
+    "audited_pairs": 37,
+    "pixel_corr_min": 0.9691773910199033,
+    "pixel_corr_median": 0.9998854107833989
+  },
+  "seed4|Hospital_A (Brain-Tumor MRI)|conf": {
+    "n": 210,
+    "n_dup": 42,
+    "frac_dup": 0.2,
+    "n_exact_hash": 15,
+    "threshold_bits": 10,
+    "audited_pairs": 42,
+    "pixel_corr_min": 0.9734489930540586,
+    "pixel_corr_median": 0.9998509942064684
+  },
+  "seed4|Hospital_A (Brain-Tumor MRI)|test": {
+    "n": 1600,
+    "n_dup": 427,
+    "frac_dup": 0.266875,
+    "n_exact_hash": 140,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9558495177325035,
+    "pixel_corr_median": 0.9998682702128388
+  },
+  "seed4|Hospital_B (Breast Ultrasound)|temp": {
+    "n": 29,
+    "n_dup": 3,
+    "frac_dup": 0.10344827586206896,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9824706872612041,
+    "pixel_corr_median": 0.9914449904397364
+  },
+  "seed4|Hospital_B (Breast Ultrasound)|conf": {
+    "n": 30,
+    "n_dup": 4,
+    "frac_dup": 0.13333333333333333,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 4,
+    "pixel_corr_min": 0.9805439396771225,
+    "pixel_corr_median": 0.9914612907067379
+  },
+  "seed4|Hospital_B (Breast Ultrasound)|test": {
+    "n": 117,
+    "n_dup": 16,
+    "frac_dup": 0.13675213675213677,
+    "n_exact_hash": 1,
+    "threshold_bits": 10,
+    "audited_pairs": 16,
+    "pixel_corr_min": 0.9698925513652343,
+    "pixel_corr_median": 0.9958966554696556
+  },
+  "seed4|Hospital_C (COVID-19 X-Ray)|temp": {
+    "n": 794,
+    "n_dup": 15,
+    "frac_dup": 0.018891687657430732,
+    "n_exact_hash": 3,
+    "threshold_bits": 10,
+    "audited_pairs": 15,
+    "pixel_corr_min": 0.7019972431667084,
+    "pixel_corr_median": 0.9999139114071104
+  },
+  "seed4|Hospital_C (COVID-19 X-Ray)|conf": {
+    "n": 794,
+    "n_dup": 14,
+    "frac_dup": 0.017632241813602016,
+    "n_exact_hash": 6,
+    "threshold_bits": 10,
+    "audited_pairs": 14,
+    "pixel_corr_min": 0.7945475775785331,
+    "pixel_corr_median": 0.9999479912182017
+  },
+  "seed4|Hospital_C (COVID-19 X-Ray)|test": {
+    "n": 3175,
+    "n_dup": 62,
+    "frac_dup": 0.01952755905511811,
+    "n_exact_hash": 25,
+    "threshold_bits": 10,
+    "audited_pairs": 62,
+    "pixel_corr_min": 0.8104324797810376,
+    "pixel_corr_median": 0.9999327832959206
+  },
+  "seed4|Hospital_D (Dermatology, DermaMNIST)|temp": {
+    "n": 251,
+    "n_dup": 1,
+    "frac_dup": 0.00398406374501992,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 1,
+    "pixel_corr_min": 0.9957984310545369,
+    "pixel_corr_median": 0.9957984310545369
+  },
+  "seed4|Hospital_D (Dermatology, DermaMNIST)|conf": {
+    "n": 251,
+    "n_dup": 0,
+    "frac_dup": 0.0,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 0,
+    "pixel_corr_min": null,
+    "pixel_corr_median": null
+  },
+  "seed4|Hospital_D (Dermatology, DermaMNIST)|test": {
+    "n": 2005,
+    "n_dup": 3,
+    "frac_dup": 0.0014962593516209476,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9974261471268759,
+    "pixel_corr_median": 0.9979928262393327
+  },
+  "seed4|Hospital_E (Retina/DR Grading, RetinaMNIST)|temp": {
+    "n": 30,
+    "n_dup": 3,
+    "frac_dup": 0.1,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.8776854427155506,
+    "pixel_corr_median": 0.9765400167009369
+  },
+  "seed4|Hospital_E (Retina/DR Grading, RetinaMNIST)|conf": {
+    "n": 30,
+    "n_dup": 3,
+    "frac_dup": 0.1,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 3,
+    "pixel_corr_min": 0.9313032179945682,
+    "pixel_corr_median": 0.9547327669078729
+  },
+  "seed4|Hospital_E (Retina/DR Grading, RetinaMNIST)|test": {
+    "n": 400,
+    "n_dup": 63,
+    "frac_dup": 0.1575,
+    "n_exact_hash": 0,
+    "threshold_bits": 10,
+    "audited_pairs": 63,
+    "pixel_corr_min": 0.7965386950094604,
+    "pixel_corr_median": 0.9703491854175498
+  },
+  "seed4|ood_brisc2025|vs_hospitalA_all": {
+    "n": 1000,
+    "n_dup": 857,
+    "frac_dup": 0.857,
+    "n_exact_hash": 857,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9999999999248657,
+    "pixel_corr_median": 0.999999999948081
+  },
+  "seed4|ood_pmram|vs_hospitalA_all": {
+    "n": 1505,
+    "n_dup": 849,
+    "frac_dup": 0.5641196013289037,
+    "n_exact_hash": 507,
+    "threshold_bits": 10,
+    "audited_pairs": 200,
+    "pixel_corr_min": 0.9811878191814218,
+    "pixel_corr_median": 0.9999796446556233
+  }
+}

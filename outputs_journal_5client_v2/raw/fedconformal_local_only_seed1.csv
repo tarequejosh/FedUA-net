@@ -1,0 +1,46 @@
+strategy,seed,client_name,alpha,mode,n_calib,q_hat,coverage,mean_set_size,shrinkage_weight
+local_only,1,Hospital_A (Brain-Tumor MRI),0.05,marginal_federated,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_A (Brain-Tumor MRI),0.05,group,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_A (Brain-Tumor MRI),0.05,shrunk,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_B (Breast Ultrasound),0.05,marginal_federated,30,1.0,1.0,3.0,0.23076923076923078
+local_only,1,Hospital_B (Breast Ultrasound),0.05,group,30,0.9999999888241291,1.0,3.0,0.23076923076923078
+local_only,1,Hospital_B (Breast Ultrasound),0.05,shrunk,30,0.9999999974209528,1.0,3.0,0.23076923076923078
+local_only,1,Hospital_C (COVID-19 X-Ray),0.05,marginal_federated,794,1.0,1.0,4.0,0.8881431767337807
+local_only,1,Hospital_C (COVID-19 X-Ray),0.05,group,794,0.9742643004283309,0.9933858267716535,2.110551181102362,0.8881431767337807
+local_only,1,Hospital_C (COVID-19 X-Ray),0.05,shrunk,794,0.9771430140269516,0.9962204724409449,2.331023622047244,0.8881431767337807
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.05,marginal_federated,251,1.0,1.0,7.0,0.7150997150997151
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.05,group,251,0.946112597361207,0.9835411471321696,3.1960099750623443,0.7150997150997151
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.05,shrunk,251,0.9614651337255355,0.9890274314214463,4.296758104738155,0.7150997150997151
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.05,marginal_federated,30,1.0,1.0,5.0,0.23076923076923078
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.05,group,30,0.9999999422580004,1.0,5.0,0.23076923076923078
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.05,shrunk,30,0.9999999866749231,1.0,5.0,0.23076923076923078
+local_only,1,Hospital_A (Brain-Tumor MRI),0.1,marginal_federated,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_A (Brain-Tumor MRI),0.1,group,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_A (Brain-Tumor MRI),0.1,shrunk,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_B (Breast Ultrasound),0.1,marginal_federated,30,1.0,1.0,3.0,0.23076923076923078
+local_only,1,Hospital_B (Breast Ultrasound),0.1,group,30,0.9474007040262222,0.9914529914529915,2.0256410256410255,0.23076923076923078
+local_only,1,Hospital_B (Breast Ultrasound),0.1,shrunk,30,0.9878617009291282,1.0,3.0,0.23076923076923078
+local_only,1,Hospital_C (COVID-19 X-Ray),0.1,marginal_federated,794,1.0,1.0,4.0,0.8881431767337807
+local_only,1,Hospital_C (COVID-19 X-Ray),0.1,group,794,0.9719404131174088,0.9918110236220472,1.9977952755905513,0.8881431767337807
+local_only,1,Hospital_C (COVID-19 X-Ray),0.1,shrunk,794,0.9750790693682578,0.9949606299212599,2.1603149606299215,0.8881431767337807
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.1,marginal_federated,251,1.0,1.0,7.0,0.7150997150997151
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.1,group,251,0.9383377134799957,0.9810473815461347,2.685785536159601,0.7150997150997151
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.1,shrunk,251,0.9559053164771479,0.9870324189526185,3.8972568578553615,0.7150997150997151
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.1,marginal_federated,30,1.0,1.0,5.0,0.23076923076923078
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.1,group,30,0.9783952701836824,0.9675,4.26,0.23076923076923078
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.1,shrunk,30,0.9950142931193113,1.0,5.0,0.23076923076923078
+local_only,1,Hospital_A (Brain-Tumor MRI),0.2,marginal_federated,210,0.9732105969451368,0.961875,1.0025,0.6774193548387096
+local_only,1,Hospital_A (Brain-Tumor MRI),0.2,group,210,1.0,0.963125,1.01125,0.6774193548387096
+local_only,1,Hospital_A (Brain-Tumor MRI),0.2,shrunk,210,0.9913582570790764,0.961875,1.003125,0.6774193548387096
+local_only,1,Hospital_B (Breast Ultrasound),0.2,marginal_federated,30,0.9732105969451368,1.0,2.948717948717949,0.23076923076923078
+local_only,1,Hospital_B (Breast Ultrasound),0.2,group,30,0.9381920695304871,0.9829059829059829,1.9059829059829059,0.23076923076923078
+local_only,1,Hospital_B (Breast Ultrasound),0.2,shrunk,30,0.9651293983109868,0.9914529914529915,2.3162393162393164,0.23076923076923078
+local_only,1,Hospital_C (COVID-19 X-Ray),0.2,marginal_federated,794,0.9732105969451368,0.992755905511811,2.0636220472440945,0.8881431767337807
+local_only,1,Hospital_C (COVID-19 X-Ray),0.2,group,794,0.9699811339378357,0.9899212598425197,1.868976377952756,0.8881431767337807
+local_only,1,Hospital_C (COVID-19 X-Ray),0.2,shrunk,794,0.9703423714106881,0.9908661417322835,1.8954330708661418,0.8881431767337807
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.2,marginal_federated,251,0.9732105969451368,0.9915211970074813,5.161596009975062,0.7150997150997151
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.2,group,251,0.9326075613498688,0.9765586034912718,2.343142144638404,0.7150997150997151
+local_only,1,"Hospital_D (Dermatology, DermaMNIST)",0.2,shrunk,251,0.944175377758777,0.9830423940149626,3.0658354114713218,0.7150997150997151
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.2,marginal_federated,30,0.9732105969451368,0.96,4.0075,0.23076923076923078
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.2,group,30,0.9515181742608547,0.9325,3.165,0.23076923076923078
+local_only,1,"Hospital_E (Retina/DR Grading, RetinaMNIST)",0.2,shrunk,30,0.9682046532487639,0.955,3.85,0.23076923076923078
