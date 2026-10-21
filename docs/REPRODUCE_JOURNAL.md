@@ -172,8 +172,10 @@ net = ex.new_client_net(ncls, seed)
 net.load_state_dict(torch.load(path, map_location=ex.DEV)); net.eval()
 ```
 
-**Download:** CHECKPOINT_LOCATION_TBD. Unpack into
-`outputs_journal_{3,5}client_v2/final_models/`.
+**Download:** the checkpoints are not public yet, but are available from
+the authors on request. Once you have them, unpack them into
+`outputs_journal_{3,5}client_v2/final_models/`. Until then, section 4c
+still runs end-to-end from the cached logits in `rescore/logits/`.
 
 ---
 
