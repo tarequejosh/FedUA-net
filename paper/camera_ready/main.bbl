@@ -1,0 +1,148 @@
+\begin{thebibliography}{10}
+
+\bibitem{mcmahan2017communication}
+H.~B. McMahan, E.~Moore, D.~Ramage, S.~Hampson, and B.~Ag{\"u}era~y Arcas,
+  ``Communication-efficient learning of deep networks from decentralized
+  data,'' in {\em Proceedings of the 20th International Conference on
+  Artificial Intelligence and Statistics (AISTATS)},  pp.~1273--1282, 2017.
+
+\bibitem{rieke2020future}
+N.~Rieke, J.~Hancox, W.~Li, {\em et~al.}, ``The future of digital health with
+  federated learning,'' {\em npj Digital Medicine}~{\bf 3}, p.~119, 2020.
+
+\bibitem{guan2024federated}
+H.~Guan, P.-T. Yap, A.~Bozoki, and M.~Liu, ``Federated learning for medical
+  image analysis: A survey,'' {\em Pattern Recognition}~{\bf 151}, p.~110424,
+  2024.
+
+\bibitem{litian2020fedprox}
+T.~Li, A.~K. Sahu, M.~Zaheer, M.~Sanjabi, A.~Talwalkar, and V.~Smith,
+  ``Federated optimization in heterogeneous networks,'' in {\em Proceedings of
+  Machine Learning and Systems (MLSys)},   {\bf 2}, pp.~429--450, 2020.
+
+\bibitem{lixiaoxiao2021fedbn}
+X.~Li, M.~Jiang, X.~Zhang, M.~Kamp, and Q.~Dou, ``{FedBN}: Federated learning
+  on non-{IID} features via local batch normalization,'' in {\em International
+  Conference on Learning Representations (ICLR)},  2021.
+
+\bibitem{litian2021ditto}
+T.~Li, S.~Hu, A.~Beirami, and V.~Smith, ``{Ditto}: Fair and robust federated
+  learning through personalization,'' in {\em Proceedings of the 38th
+  International Conference on Machine Learning (ICML)},  pp.~6357--6368, 2021.
+
+\bibitem{oh2022fedbabu}
+J.~Oh, S.~Kim, and S.-Y. Yun, ``{FedBABU}: Towards enhanced representation for
+  federated image classification,'' in {\em Proceedings of the 10th
+  International Conference on Learning Representations (ICLR)},  2022.
+
+\bibitem{guo2017calibration}
+C.~Guo, G.~Pleiss, Y.~Sun, and K.~Q. Weinberger, ``On calibration of modern
+  neural networks,'' in {\em Proceedings of the 34th International Conference
+  on Machine Learning (ICML)},  pp.~1321--1330, 2017.
+
+\bibitem{angelopoulos2023gentle}
+A.~N. Angelopoulos and S.~Bates, ``Conformal prediction: A gentle
+  introduction,'' {\em Foundations and Trends in Machine Learning}~{\bf 16}(4),
+  pp.~494--591, 2023.
+
+\bibitem{arivazhagan2019federated}
+M.~G. Arivazhagan, V.~Aggarwal, A.~K. Singh, and S.~Choudhary, ``Federated
+  learning with personalization layers.'' arXiv preprint, 2019.
+\newblock arXiv:1912.00818.
+
+\bibitem{lu2024fedhca2}
+Y.~Lu, S.~Huang, Y.~Yang, S.~Sirejiding, Y.~Ding, and H.~Lu, ``{FedHCA$^2$}:
+  Towards hetero-client federated multi-task learning,'' in {\em Proc. IEEE/CVF
+  Conference on Computer Vision and Pattern Recognition (CVPR)},  2024.
+
+\bibitem{sun2024fedmlp}
+Z.~Sun, N.~Wu, J.~Shi, L.~Yu, X.~Yang, K.-T. Cheng, and Z.~Yan, ``{FedMLP}:
+  Federated multi-label medical image classification under task
+  heterogeneity,'' in {\em Medical Image Computing and Computer Assisted
+  Intervention (MICCAI)},  2024.
+
+\bibitem{chen2026fm2}
+S.~Chen and T.~Shu, ``{FM$^2$}: Unified federated foundation models for
+  heterogeneous multimodal medical imaging,'' in {\em Proc. ACM International
+  Conference on Multimedia (ACM MM)},  2026.
+\newblock arXiv:2607.13386.
+
+\bibitem{liu2026omnifm}
+M.~Liu, J.~Wang, and J.~Shan, ``{OmniFM}: Toward modality-robust and
+  task-agnostic federated learning for heterogeneous medical imaging,'' in {\em
+  Proc. IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+   2026.
+\newblock arXiv:2603.21660.
+
+\bibitem{mohri2019agnostic}
+M.~Mohri, G.~Sivek, and A.~T. Suresh, ``Agnostic federated learning,'' in {\em
+  Proceedings of the 36th International Conference on Machine Learning (ICML)},
+   {\em PMLR} {\bf 97}, pp.~4615--4625, 2019.
+
+\bibitem{li2020qffl}
+T.~Li, M.~Sanjabi, A.~Beirami, and V.~Smith, ``Fair resource allocation in
+  federated learning,'' in {\em International Conference on Learning
+  Representations (ICLR)},  2020.
+
+\bibitem{muller2019label}
+R.~M{\"u}ller, S.~Kornblith, and G.~E. Hinton, ``When does label smoothing
+  help?,'' in {\em Advances in Neural Information Processing Systems
+  (NeurIPS)},   {\bf 32}, 2019.
+
+\bibitem{peng2024fedcal}
+H.~Peng, H.~Yu, X.~Tang, and X.~Li, ``{FedCal}: Achieving local and global
+  calibration in federated learning via aggregated parameterized scaler,'' in
+  {\em Proceedings of the 41st International Conference on Machine Learning
+  (ICML)},  {\em PMLR} {\bf 235}, pp.~40331--40346, 2024.
+
+\bibitem{romano2020aps}
+Y.~Romano, M.~Sesia, and E.~Cand{\`e}s, ``Classification with valid and
+  adaptive coverage,'' in {\em Advances in Neural Information Processing
+  Systems (NeurIPS)},   {\bf 33}, pp.~3581--3591, 2020.
+
+\bibitem{angelopoulos2021raps}
+A.~N. Angelopoulos, S.~Bates, J.~Malik, and M.~I. Jordan, ``Uncertainty sets
+  for image classifiers using conformal prediction,'' in {\em Proceedings of
+  the 9th International Conference on Learning Representations (ICLR)},  2021.
+
+\bibitem{sadinle2019least}
+M.~Sadinle, J.~Lei, and L.~Wasserman, ``Least ambiguous set-valued classifiers
+  with bounded error levels,'' {\em Journal of the American Statistical
+  Association}~{\bf 114}(525), pp.~223--234, 2019.
+
+\bibitem{lu2023federated}
+C.~Lu, Y.~Yu, S.~P. Karimireddy, M.~Jordan, and R.~Raskar, ``Federated
+  conformal predictors for distributed uncertainty quantification,'' in {\em
+  Proceedings of the 40th International Conference on Machine Learning (ICML)},
+   pp.~22942--22964, 2023.
+
+\bibitem{tan2021efficientnetv2}
+M.~Tan and Q.~V. Le, ``{EfficientNetV2}: Smaller models and faster training,''
+  in {\em Proceedings of the 38th International Conference on Machine Learning
+  (ICML)},  pp.~10096--10106, 2021.
+
+\bibitem{woo2018cbam}
+S.~Woo, J.~Park, J.-Y. Lee, and I.~S. Kweon, ``{CBAM}: Convolutional block
+  attention module,'' in {\em Proceedings of the European Conference on
+  Computer Vision (ECCV)},  pp.~3--19, 2018.
+
+\bibitem{nickparvar2021brain}
+M.~Nickparvar, ``Brain tumor {MRI} dataset.'' Kaggle,
+  \url{https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset},
+  2021.
+
+\bibitem{aldhabyani2020dataset}
+W.~Al-Dhabyani, M.~Gomaa, H.~Khaled, and A.~Fahmy, ``Dataset of breast
+  ultrasound images,'' {\em Data in Brief}~{\bf 28}, p.~104863, 2020.
+
+\bibitem{chowdhury2020ai}
+M.~E.~H. Chowdhury, T.~Rahman, A.~Khandakar, {\em et~al.}, ``Can {AI} help in
+  screening viral and {COVID-19} pneumonia?,'' {\em IEEE Access}~{\bf 8},
+  pp.~132665--132676, 2020.
+
+\bibitem{rahman2021exploring}
+T.~Rahman, A.~Khandakar, Y.~Qiblawey, {\em et~al.}, ``Exploring the effect of
+  image enhancement techniques on {COVID-19} detection using chest {X}-ray
+  images,'' {\em Computers in Biology and Medicine}~{\bf 132}, p.~104319, 2021.
+
+\end{thebibliography}

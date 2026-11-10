@@ -1,90 +1,32 @@
-# ==============================================================================
-# FedUA-Net: Open-Science Publication .gitignore
-# ==============================================================================
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
+.ipynb_checkpoints/
 
-# Environments & Packages
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# PyTorch Caches & Model Weights
+# Pretrained-weight cache created by torchvision
 .torch_cache/
-*.pt
-*.pth
-*.bin
-*.onnx
-outputs_final/models/
-outputs_experiments/models/
-results/**/models/
 
-# Experiments & Logs
-outputs_*/
-wandb/
-runs/
-*.log
-
-# Large Datasets
+# Datasets (download separately, see README)
 Dataset/
 data/
-datasets/
-*.zip
-*.tar
-*.tar.gz
-*.7z
 
-# Jupyter Notebook Checkpoints
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
+# New training / analysis outputs
+results_new/
+outputs*/
 
-# IDE and Editor settings
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Operating System Files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# Temporary Scratch Files & Word Locks
-scratch/
-~$*
-temp/
-*.tmp
-*.docx
-baseline_report.txt
-
-# Manuscripts, Drafts, and Writing Notes (kept private locally)
-paper.tex
-paper.pdf
-paper_draft/
-literature_review/
-PROGRESS.md
-
-# LaTeX Build Intermediate Artifacts
+# LaTeX build files (main.bbl is kept so the paper builds without BibTeX)
 *.aux
-*.bbl
+*.log
 *.blg
+*.out
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-*.toc
-*.out
 
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+~$*
